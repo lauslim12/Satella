@@ -1,3 +1,12 @@
+# BUG: If ID is placed, the 'generate_weighted_random' can fail. Look at line 100 and 285 (variable object and returned function). That is the cause of the bug.
+# TODO DONE: Add argparser, change weighed algorithm to be 10% of the max page, disable gender checks (argparser), and add counter to prevent hoarding.
+# TODO: Devise new algorithm step before looking checking -> first check all the total data in the current year. Store variable in the 'max_pages' variable.
+# TODO: Implement the 'NoneCharacterError' exception.
+# TODO: Also be able to check from manga.
+# TODO: PyInstaller for executable files.
+# TODO: CSV Name to constants -- add option to take from argument parser.
+# TODO: clean.py to main.py with argument parser.
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
