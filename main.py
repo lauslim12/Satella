@@ -71,6 +71,19 @@ query ($year: Int, $page: Int, $id: Int, $currentMainCharacterPage: Int, $curren
 }
 '''
 
+
+class MaxCallsReachedError(Exception):
+    def __init__(self):
+        self.message = "You have already reached your max calls for this session! Please restart the program!"
+
+
+def check_if_already_at_the_limit(data):
+    if data.api_calls >= API_MAX_CALL_PER_PROGRAM:
+        raise MaxCallsReachedError()
+
+    return None
+
+
 def main():
     pass
 
