@@ -81,6 +81,23 @@ query ($year: Int, $page: Int, $id: Int, $currentMainCharacterPage: Int, $curren
 }
 '''
 
+# Argument Parser
+parser = argparse.ArgumentParser(
+    description="Satella (version {}) is a program that helps you get your favorite characters via a personalized algorithm. Contribute to the project by contacting @lauslim12 on GitHub!".format(__version__),
+    epilog='Please enjoy this automated program! If you have any issues or have any suggestions, please contact @lauslim12 at GitHub!')
+parser.add_argument('-i', '--id', help='The anime ID that you want to query, but be warned that if you try to query by ID, then it is impossible to query by the year',
+                    dest='specified_anime_id', type=int)
+parser.add_argument('-y', '--year', help='The year to search for the animes',
+                    dest='year', default=datetime.now().year, type=int)
+parser.add_argument('-s',
+                    '--season', help='The season to search for the animes. Can be combined with --year for better filtering', dest='season_name', choices=['SPRING', 'SUMMER', 'FALL', 'WINTER'], type=str)
+parser.add_argument('-gf',
+                    '--gender-filter', help='To disable exception being thrown if the character found is a male character', dest='male_filter', choices=['TRUE', 'FALSE'], type=str, default='TRUE')
+parser.add_argument('-nf', '--none-filter', help='To disable exception being thrown if the character found is of unknown gender',
+                    dest='none_filter', choices=['TRUE', 'FALSE'], type=str, default='FALSE')
+
+args = parser.parse_args()
+
 
 # Intentionally made public for easier data handling. We do not need any encapsulation in this part, as all the data is freely available.
 class Data:
