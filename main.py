@@ -305,6 +305,42 @@ def fetch_data(data, current_page=0):
     return None
 
 
+# 1 is 'Main' and 2 is 'Supporting'
+def choose_characters(data):
+    data.number_of_main_characters_pages = data.characters['mainCharacters']['pageInfo']['lastPage']
+    data.number_of_supporting_characters_pages = data.characters[
+        'supportingCharacters']['pageInfo']['lastPage']
+
+    # Randomized integer to take data from a certain page.
+    if data.contains_supporting is False:
+        print("No supporting characters in this anime! All data taken will be from main characters!")
+
+        # Randomly choose which page to take a character from.
+        data.page_to_take = randint(1, data.number_of_main_characters_pages)
+
+        # Instantly call the 'take_character' function.
+        data.main_characters = data.characters['mainCharacters']['nodes']
+        data.character_type = 1
+        return None
+    else:
+        # Randomly choose (50% chance) whether to take data from a main character or a supporting character.
+        choose_from_main = choice([True, False])
+
+        if choose_from_main is True:
+            # Randomly choose which page to take a character from.
+            data.page_to_take = randint(
+                1, data.number_of_main_characters_pages)
+            data.main_characters = data.characters['mainCharacters']['nodes']
+            data.character_type = 1
+            return None
+
+        # Randomly choose which page to take a character from.
+        data.page_to_take = randint(
+            1, data.number_of_supporting_characters_pages)
+        data.supporting_characters = data.characters['supportingCharacters']['nodes']
+        data.character_type = 2
+        return None
+
 def main():
     data = Data()
 
