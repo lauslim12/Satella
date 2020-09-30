@@ -341,6 +341,54 @@ def choose_characters(data):
         data.character_type = 2
         return None
 
+
+def take_character(data):
+    # Message to tells us what type of character that we are taking.
+    if data.character_type == 1:
+        print("Taking a main character from page {}!".format(data.page_to_take))
+    else:
+        print("Taking a supporting character from page {}!".format(data.page_to_take))
+
+    # If the page is not one, then query again with the page to take a character from.
+    if data.page_to_take != 1:
+        # Increment API calls.
+        data.increment_api_calls()
+        print("Current API calls for this session:", data.api_calls)
+
+        variables = {
+            'id': data.anime_id,
+            'currentMainCharacterPage': data.page_to_take if data.character_type == 1 else 1,
+            'currentSupportingCharacterPage': data.page_to_take if data.character_type == 2 else 1
+        }
+
+        request_body = {
+            'query': GRAPHQL_QUERY,
+            'variables': variables
+        }
+
+        response = requests.post(ANILIST_API_URL, json=request_body)
+        response = response.json()
+
+        data.main_characters = response['data']['Page']['media'][0]['mainCharacters']['nodes']
+        data.supporting_characters = response['data']['Page']['media'][0]['supportingCharacters']['nodes']
+
+        # Take data randomly.
+        if data.character_type == 1:
+            data.character = choice(data.main_characters)
+        else:
+            data.character = choice(data.supporting_characters)
+    else:
+        # Take data randomly from available characters, depending on the character type.
+        data_to_take = data.main_characters if data.character_type == 1 else data.supporting_characters
+        data.character = choice(data_to_take)
+
+    character_name = data.character['name']['full']
+    print("Taken character {} from Anime ID: {} on date-time {}!".format(
+        character_name, data.anime_id, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+
+    return None
+
+
 def main():
     data = Data()
 
