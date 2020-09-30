@@ -152,9 +152,40 @@ class Data:
             'Page').get('media')[0].get('mainCharacters').get('pageInfo').get('total')
 
 
+class MaxPageExceededError(Exception):
+    def __init__(self):
+        self.message = "The randomly generated number is higher than the max page! Retrying, this time with the maximum randomly generated number being the max available number in the query."
+
+
+class NoMainCharactersError(Exception):
+    def __init__(self):
+        self.message = "There are no main characters for this anime! Fetching another data..."
+
+
+class MaleCharacterError(Exception):
+    def __init__(self):
+        self.message = "The character is a male! Retrying from another anime..."
+
+
+class NoCharacterError(Exception):
+    def __init__(self):
+        self.message = "The character is a None (undetected by the API)! Retrying from another anime..."
+
+
+class DuplicateEntryError(Exception):
+    def __init__(self):
+        self.message = "There is a duplicate entry in the CSV file! Retrying with another anime..."
+
+
 class MaxCallsReachedError(Exception):
     def __init__(self):
         self.message = "You have already reached your max calls for this session! Please restart the program!"
+
+
+class NoMediaFoundError(Exception):
+    def __init__(self, anime_id):
+        self.message = "The media with ID {} was not found! Perhaps you have typed the wrong ID? Exiting program...".format(
+            anime_id)
 
 
 def generate_weighted_random(max_pages=MAX_ANIME_PER_YEAR_ASSUMPTION):
