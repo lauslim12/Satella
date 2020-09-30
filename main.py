@@ -216,6 +216,95 @@ def check_if_already_at_the_limit(data):
     return None
 
 
+def check_maximum_page(data):
+    pass
+
+
+def fetch_data(data, current_page=0):
+    # Print message for clarity.
+    print("Current page of the present query:", current_page)
+
+    # Increment API calls.
+    data.increment_api_calls()
+    print("Current API calls for this session:", data.api_calls)
+
+    # Variables for the GraphQL.
+    # Year is set to 2020, it can be easily set to be the wanted year.
+    variables = {
+        'year': args.year,
+        'page': generate_weighted_random(MAX_ANIME_PER_YEAR_ASSUMPTION) if current_page == 0 else current_page,
+    }
+
+    # If there is an ID, append ID to the query.
+    # If the user only places an ID, remove the year. It might cause several unwanted bugs (e.g. querying an anime whose year is not in 2020, resulting in a crash)
+    # BUG: We should add an argument taken from the command line if we need to specifiy an ID and its year.
+    # specified_anime_id = args.specified_anime_id if args.specified_anime_id is not None else None
+    if args.specified_anime_id is not None:
+        variables.update({'id': args.specified_anime_id})
+        variables.pop('year')
+
+    # If there is a season specified, append seasonName to the variable.
+    # BUG: Same as above.
+    # Season: SPRING, SUMMER, FALL, WINTER
+    # season_name = None
+    if args.season_name is not None:
+        variables.update({'seasonName': args.season_name})
+
+    # Body to be sent.
+    request_body = {
+        'query': GRAPHQL_QUERY,
+        'variables': variables
+    }
+
+    # Print message for clarity.
+    page_now_looking = variables.get('page')
+    year_now_looking = variables.get('year')
+    print("Attempting to get data from page {} of year {}...".format(
+        page_now_looking, year_now_looking))
+
+    # API POST call to the GraphQL API.
+    response = requests.post(ANILIST_API_URL, json=request_body)
+    response = response.json()
+
+    # Shuffle through the results.
+    data.max_pages = response['data']['Page']['pageInfo']['total']
+    data.current_page = response['data']['Page']['pageInfo']['currentPage']
+
+    # Precaution: If searching results in no data, raise an error.
+    if data.max_pages <= 0:
+        raise NoMediaFoundError(args.specified_anime_id)
+
+    # If the current randomly generated page fails, retry query again with a randomly generated number whose maximum is the 'max_pages' variable.
+    if data.max_pages < data.current_page:
+        data.current_page = generate_weighted_random(data.max_pages)
+        raise MaxPageExceededError()
+
+    data.number_of_main_characters = response['data']['Page']['media'][0]['mainCharacters']['pageInfo']['total']
+    data.number_of_supporting_characters = response['data']['Page'][
+        'media'][0]['supportingCharacters']['pageInfo']['total']
+    data.anime_id = response['data']['Page']['media'][0]['id']
+    data.anime_name = response['data']['Page']['media'][0]['title']['userPreferred']
+
+    # Print message for clarity.
+    print("Attempting to take data from anime: {}... (ID: {})".format(
+        data.anime_name, data.anime_id))
+
+    # Check for empty objects.
+    if data.number_of_main_characters <= 0:
+        data.current_page = generate_weighted_random(data.max_pages)
+        raise NoMainCharactersError()
+
+    # Print the character generated.
+    data.characters = response['data']['Page']['media'][0]
+
+    # Check for empty supporting characters. Main characters cannot be empty, because it has passed the above check.
+    if data.number_of_supporting_characters <= 0:
+        data.contains_supporting = False
+        return None
+
+    return None
+
+
 def main():
     data = Data()
 
