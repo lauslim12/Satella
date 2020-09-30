@@ -1,0 +1,11 @@
+# Python Virtual Environment
+.venv
+venv
+
+# Visual Studio Code
+.vscode/
+
+# Python Distribution and Packaging
+*.egg
+build/
+dist/
