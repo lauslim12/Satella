@@ -440,6 +440,43 @@ def determine_gender(data):
     return None
 
 
+def write_to_csv(data):
+    print(json.dumps(data.character, indent=2))
+    # Parse the character dict into variables for easier typing.
+    character_id = data.character['id']
+    character_first_name = data.character['name']['first']
+    character_last_name = data.character['name']['last']
+    character_full_name = data.character['name']['full']
+    character_favorites = data.character['favourites']
+    date_taken = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    # Check for duplicates first. If it contains duplicate, it will raise an exception.
+    check_for_duplicate_entries(character_id, data)
+
+    # BUG: This should have max_pages. Fix it when we modularize all the functions to main.
+    # if is_duplicate is True:
+    #     return False
+
+    # Store the data into a CSV file.
+    with open('data/suggestions.csv', 'a', newline='', encoding='utf-8') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow([character_id, character_first_name, character_last_name, character_full_name,
+                             character_favorites, data.predicted_gender, data.predicted_probability, data.anime_name, date_taken])
+
+    print("Data successfully stored in CSV!")
+    return True
+
+
+def check_for_duplicate_entries(character_id, data):
+    # Check for duplicates.
+    with open('data/suggestions.csv', 'r', encoding='utf-8') as csv_file:
+        if str(character_id) in csv_file.read():
+            data.current_page = generate_weighted_random(data.max_pages)
+            raise DuplicateEntryError()
+
+        return False
+
+
 def main():
     data = Data()
 
