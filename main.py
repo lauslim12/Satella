@@ -389,6 +389,57 @@ def take_character(data):
     return None
 
 
+def determine_gender(data):
+    # We also pass the main characters array to perform the second optional algorithm, which is if not female, then instead of reshuffling through the anime, we can simply increase the index by one, and if the index is full, check supporting characters.
+    # Determine a character name.
+    # If the first name is empty, then prepare to use the last name instead.
+    character_name = data.character['name']['first'] if data.character[
+        'name']['first'] != "" else data.character['name']['last']
+    character_name = character_name.strip()
+    formatted_genderize_api_url = "{}?name={}&country_id=JP".format(
+        GENDERIZE_API_URL, character_name)
+
+    response = requests.get(formatted_genderize_api_url)
+    response = response.json()
+
+    # Parse the output.
+    data.predicted_gender = response['gender']
+    data.predicted_probability = response['probability']
+
+    # Print message for clarity.
+    print("Character {} is a {} with the probability of {}% (using Japanese country code).".format(
+        character_name, data.predicted_gender, data.predicted_probability * 100))
+
+    # If female, no matter the probability, insert to CSV.
+    # If male > 50%, reject.
+    # If Null, another API call without the country code (some anime girls can have weird names)
+    # If Null results in Null or Male (< 50%), insert to CSV.
+    # BUG: Please use booleans, not strings.
+    if data.predicted_gender == "male" and data.predicted_probability > 0.5 and args.male_filter == "TRUE":
+        data.current_page = generate_weighted_random(data.max_pages)
+        raise MaleCharacterError()
+
+    if data.predicted_gender is None:
+        formatted_genderize_api_url = "{}?name={}".format(
+            GENDERIZE_API_URL, character_name)
+        response = requests.get(formatted_genderize_api_url)
+        response = response.json()
+
+        data.predicted_gender = response['gender']
+        data.predicted_probability = response['probability']
+
+        # Print message for clarity.
+        print("Character {} is a {} with the probability of {}% (no country code used).".format(
+            character_name, data.predicted_gender, data.predicted_probability * 100))
+
+        # BUG: Please use booleans, not strings.
+        if data.predicted_gender == "male" and data.predicted_probability > 0.5 and args.male_filter == "TRUE":
+            data.current_page = generate_weighted_random(data.max_pages)
+            raise MaleCharacterError()
+
+    return None
+
+
 def main():
     data = Data()
 
