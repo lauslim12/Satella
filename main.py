@@ -2,8 +2,14 @@
 # -*- coding: utf-8 -*-
 
 # Imports
+import argparse
+import csv
+import json
 import math
-from random import randint
+import requests
+import pprint  # DEBUG purposes only!
+from datetime import datetime
+from random import randint, choice
 
 # Metadata
 __author__ = "Nicholas Dwiarto Wirasbawa"
@@ -76,6 +82,59 @@ query ($year: Int, $page: Int, $id: Int, $currentMainCharacterPage: Int, $curren
 '''
 
 
+# Intentionally made public for easier data handling. We do not need any encapsulation in this part, as all the data is freely available.
+class Data:
+    def __init__(self):
+        # Main
+        self.characters = {}
+        self.character = {}
+        self.anime_id = 0
+        self.anime_name = None
+        self.page = {}
+        self.contains_supporting = True
+        self.page_to_take = 0
+        self.character_type = 0
+        self.predicted_gender = 0
+        self.predicted_probability = 0
+        self.number_of_main_characters = 0
+        self.number_of_supporting_characters = 0
+        self.number_of_main_characters_pages = 0
+        self.number_of_supporting_characters_pages = 0
+        self.main_characters = {}
+        self.supporting_characters = {}
+
+        # Utilities
+        self.api_calls = 0
+        self.max_pages = 0
+        self.current_page = 0
+
+    # BUG: Very redundant.
+    def free_resources(self):
+        self.characters = {}
+        self.character = {}
+        self.anime_id = 0
+        self.anime_name = None
+        self.page = {}
+        self.contains_supporting = True
+        self.page_to_take = 0
+        self.character_type = 0
+        self.predicted_gender = 0
+        self.predicted_probability = 0
+        self.number_of_main_characters = 0
+        self.number_of_supporting_characters = 0
+        self.number_of_main_characters_pages = 0
+        self.number_of_supporting_characters_pages = 0
+        self.main_characters = {}
+        self.supporting_characters = {}
+
+    def increment_api_calls(self):
+        self.api_calls += 1
+
+    def generate_number_of_main_characters(self, response):
+        self.number_of_main_characters = response.get('data', None).get(
+            'Page').get('media')[0].get('mainCharacters').get('pageInfo').get('total')
+
+
 class MaxCallsReachedError(Exception):
     def __init__(self):
         self.message = "You have already reached your max calls for this session! Please restart the program!"
@@ -110,7 +169,7 @@ def check_if_already_at_the_limit(data):
 
 
 def main():
-    pass
+    data = Data()
 
 
 if __name__ == "__main__":
