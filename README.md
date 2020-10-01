@@ -68,3 +68,49 @@ The project structure itself is very simple.
 * `auto/main.sh` and `auto/main.bat` are the shell scripts required for automating the system. For Linux and Windows, respectively.
 * The `requirements.txt` file is dedicated for the dependencies that I use to make and to keep this application running.
 * The rest are usual Git documents (`.gitignore`, `CONTRIBUTING.md`, `README.md`, `LICENSE`).
+
+## Installation
+
+The installation guide assumes that you are using Linux for this part. For those using Windows, you just have to replace the `python3` with `python`. For the automation, just use the `main.bat` (instead of `main.sh`) file. Personally, I use my Raspberry Pi via SSH to do the installation steps.
+
+### General Setup
+
+The following setup is used to start the application on its basic form.
+
+* Ensure that your Python is 3.5 or up!
+
+```bash
+python3 --version
+```
+
+* First off, fork my repository, then clone it. I am going to assume that you cloned the repository to the `Home` directory.
+
+```bash
+git clone <your_fork_url>
+cd $HOME/Satella
+```
+
+* Second, create a Python Virtual Environment (in your Linux machine), then install the requirements. You can also use the `setup.py` if you wish for it.
+
+```bash
+python3 -m venv venv
+source "venv/bin/activate"
+pip3 install -r requirements.txt
+python3 setup.py install
+```
+
+* As an initial setup, clear all the data that I might have in my repository.
+
+```bash
+python3 clean.py
+```
+
+* Actually, after above steps are done, you can easily run the application using the following command. However, there is no automation yet, as we have not yet set it up.
+
+```bash
+python3 main.py <optional_arguments>
+```
+
+* The application will then run, and then it will store its results in the `data/suggestions.csv` file.
+
+* As a note, optional arguments are explained in below setup.
