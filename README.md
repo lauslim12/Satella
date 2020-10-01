@@ -14,3 +14,18 @@ Satella is a dedicated repository that helps you to get a recommendation of seas
 This application runs on Shell and Python (3.5 and up) and mostly relies on crontabs to get it working automatically each day. Data gathered from Satella will be stored in a CSV (soon SQL) file for further processing (further processing could be displaying it in a website, or even as simple as opening the CSV on a Microsoft Excel and inferring it by yourself).
 
 It is recommended to run Satella on a low-power micro-computer such as Raspberry Pi Model A+. I personally use them and it makes the automation easier and less costly.
+
+## Development
+
+Satella is still under continuous development and there are still more features in my mind that I am coding currently! Keep in touch by starring this repository!
+
+## Architecture
+
+* Internet Of Things
+* Object Oriented Programming
+* Python Programming Language
+* Shell Scripts and Micro Computers for Automation
+
+## Philosophy
+
+The name 'Satella' comes from the the character 'Satella' from Re:Zero. I actually like the name, so I named the repository after her.
