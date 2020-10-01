@@ -199,3 +199,22 @@ git remote set-url origin git+ssh://git@github.com/username/reponame.git
 ## Data Inference
 
 * The data can be opened using a spreadsheet application (Microsoft Excel or its open source counterpart) or read raw.
+
+## Contribution
+
+Satella is completely open source and contribution to this tool is highly encouraged for everyone! Please take a look at `CONTRIBUTING.md` file and enjoy contributing!
+
+If you have found any issues during your usage of this program, please submit an issue and I'll go back to you right away.
+
+## License
+
+This application is licensed under BSD-3 License. Please see the `LICENSE` file for more information.
+
+## Credits
+
+I hereby offer thanks and credits to the following services and providers:
+
+* [AniList.co](https://anilist.co/) for providing the GraphQL API.
+* [Genderize.io](https://genderize.io/) for providing the API to predict the gender of a person based on their name.
+
+Feel free to cite everything from this repository, as long as you give your credit. Satella is not related in any way, shape, or form to my work or my research. Satella is just a personal interest turned open source.
