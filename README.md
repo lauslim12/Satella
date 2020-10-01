@@ -56,3 +56,15 @@ Satella works by following below pseudocode (simplified):
 8. We make another randomized choice to take a character from the main characters pool (if in step (5) we had gotten a main character as our character to take from) or from the supporting characters pool (if in step (5) we had gotten a supporting character as our character to take from).
 9. Make an API call to the Genderize API (with the Japan country setting) by sending our gained character name. If she is a female, then take her immediately. If the character is a Male or a None, then we make an API call again (this time with Worldwide setting). If after the API call is decided that the character is a male, then start again from step (1). If after the API call is decided that the character is a None or a Female, then continue to step (10). The 'reject male' feature can be disabled by passing an argument to the optional parameters.
 10. We simply write the data of the character that we have already taken beforehand into a CSV file.
+
+## Project Structure
+
+The project structure itself is very simple.
+
+* The `auto` folder is used to store the automation scripts.
+* The `data` folder contains the output CSV file.
+* `clean.py` is a script to clean out the CSV file with the exception of the header.
+* `main.py` is the application starting point.
+* `auto/main.sh` and `auto/main.bat` are the shell scripts required for automating the system. For Linux and Windows, respectively.
+* The `requirements.txt` file is dedicated for the dependencies that I use to make and to keep this application running.
+* The rest are usual Git documents (`.gitignore`, `CONTRIBUTING.md`, `README.md`, `LICENSE`).
