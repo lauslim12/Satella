@@ -178,19 +178,20 @@ sudo chmod -R 777 "$HOME/Satella"
 * Do not forget to setup your Git account in your machine so you can make automated cronjobs everyday.
 
 ```bash
-git config --global user.name <YOUR_USERNAME>
-git config --global user.email <YOUR_EMAIL>
+git config user.name <YOUR_USERNAME>
+git config user.email <YOUR_EMAIL>
+git config --list
 # Then, create a random commit to authenticate your password.
 
 git remote -v # Check if the remote exists.
 git remote add origin <your_fork_url> # If the remote doesn't exist, then use your fork.
 ```
 
-* Alternatively, you could use SSH in order to free yourself from the hassle of authenticating Git everyday. The guide to setup your own SSH with Linux can be [seen here (answer from StackOverflow).](https://stackoverflow.com/questions/8588768/how-do-i-avoid-the-specification-of-the-username-and-password-at-every-git-push)
+* Alternatively, you could use SSH in order to free yourself from the hassle of authenticating Git everyday. The guide to setup your own SSH with Linux can be [seen here (answer from StackOverflow)](https://stackoverflow.com/questions/8588768/how-do-i-avoid-the-specification-of-the-username-and-password-at-every-git-push). Make sure that you have already configured your `git config user.name` and `git config user.email`.
 
 ```bash
 cd ~
-ssh-keygen -t rsa -b 4096
+ssh-keygen -t rsa -b 4096 -C <your_github_email>
 ls -a # Check out your RSA '.pub' name.
 cat <your_linux_username>.pub
 # Then, configure your access keys with your GitHub configuration. After that...
@@ -199,6 +200,12 @@ git remote set-url origin git+ssh://git@github.com/username/reponame.git
 ```
 
 * Enjoy your new anime character recommendation everyday! Just check your own repository for any new updates!
+
+* To check if our crontab had run successfully:
+
+```bash
+sudo grep CRON /var/log/syslog
+```
 
 * Note that if you are using Windows as your machine that will run this program, you could bind the `main.bat` script to Windows Task Scheduler. I believe you just need to follow the instructions from the GUI to setup the scheduled tasks.
 
