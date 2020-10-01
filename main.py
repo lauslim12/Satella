@@ -489,6 +489,39 @@ def check_for_duplicate_entries(character_id, data):
 def main():
     data = Data()
 
+    while True:
+        try:
+            check_if_already_at_the_limit(data)
+            fetch_data(data, data.current_page)
+            choose_characters(data)
+            take_character(data)
+            determine_gender(data)
+            write_to_csv(data)
+        except NoMainCharactersError as error:
+            print(error.message)
+            continue
+        except MaxPageExceededError as error:
+            print(error.message)
+            continue
+        except MaleCharacterError as error:
+            print(error.message)
+            continue
+        except DuplicateEntryError as error:
+            print(error.message)
+            continue
+        except MaxCallsReachedError as error:
+            print(error.message)
+            break
+        except NoMediaFoundError as error:
+            print(error.message)
+            break
+        else:
+            break
+        finally:
+            data.free_resources()
+
+    # pprint.pprint(vars(data))
+
 
 if __name__ == "__main__":
     main()
