@@ -29,3 +29,15 @@ Satella is still under continuous development and there are still more features 
 ## Philosophy
 
 The name 'Satella' comes from the the character 'Satella' from Re:Zero. I actually like the name, so I named the repository after her.
+
+## Requirements
+
+In order to run the baseline of this application, you just need the following two things.
+
+* Windows / Linux Environment (Linux is recommended)
+* Python 3.5 and up, complete with PIP
+
+In order to automate the application, then you will also need the following things.
+
+* Raspberry Pi (any version is fine, optional)
+* Raspbian OS (for the Raspberry Pi, also optional)
