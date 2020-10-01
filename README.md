@@ -99,6 +99,12 @@ pip3 install -r requirements.txt
 python3 setup.py install
 ```
 
+* A note to keep in mind, if you just want to install the 'production-ready' environment (also known as plug-and-play), then you just need to install the `requests` library.
+
+```bash
+pip3 install requests
+```
+
 * As an initial setup, clear all the data that I might have in my repository.
 
 ```bash
