@@ -41,3 +41,18 @@ In order to automate the application, then you will also need the following thin
 
 * Raspberry Pi (any version is fine, optional)
 * Raspbian OS (for the Raspberry Pi, also optional)
+
+## How it Works
+
+Satella works by following below pseudocode (simplified):
+
+1. First off, the program will check if the maximum API calls has been reached by the program or not. If yes, exit the program and ask the user to use it again.
+2. If not, the program will then fetch random data based on the GraphQL query on the `main.py` file. There is an extra metric that you should keep your eyes on: a weighed random number generator. In the first iteration, I assume that there are 400 animes for this year. The second and above iteration will always have the maximum possible random number to be the maximum count of current year's anime.
+3. The weighed number generator is 85% biased towards the number with higher favorites (means that you are more likely to get a character from a higher-favorited anime). As an added note, 'higher favorites' that we mean here is the top 10% anime for the current year. In other words, you are more likely to get a character from the top 10% anime of this year. Note that if you are querying by an ID, the random number gotten will always be one.
+4. If there is no anime based on a query (total page is zero), then retry step (1).
+5. If there is an anime, then check if it has supporting characters or not. If not, then only take the main characters. If yes, then it is 50-50 chance to get either a main character or a supporting character. We will take the 'pool' or the array of main characters or the supporting characters.
+6. In the same time as step (5), the program will also generate a random number based on a 'page' that we will take the character from.
+7. If the page generated is not one, then we will make a query again to get the pool of characters based on that generated page number. If the page generated is one, continue to step (8).
+8. We make another randomized choice to take a character from the main characters pool (if in step (5) we had gotten a main character as our character to take from) or from the supporting characters pool (if in step (5) we had gotten a supporting character as our character to take from).
+9. Make an API call to the Genderize API (with the Japan country setting) by sending our gained character name. If she is a female, then take her immediately. If the character is a Male or a None, then we make an API call again (this time with Worldwide setting). If after the API call is decided that the character is a male, then start again from step (1). If after the API call is decided that the character is a None or a Female, then continue to step (10). The 'reject male' feature can be disabled by passing an argument to the optional parameters.
+10. We simply write the data of the character that we have already taken beforehand into a CSV file.
