@@ -14,7 +14,7 @@ Both `autopep8` and `pylint` are available in the `requirements.txt` file.
 
 ## Commit Style Guide
 
-Please use [Semantic Commit Messages](https://seesparkbox.com/foundry/semantic_commit_messages), but with past tense. For further details, please check [this gist](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716). Using these kinds of commit messages will make contributors into better programmers because of its rigid style. Another reason of using it is because its rigid style actually forces contributors to **not commit lots of files in one setting.**
+Please use [Semantic Commit Messages](https://seesparkbox.com/foundry/semantic_commit_messages), but with past tense and first letter capitalized. For further details, please check [this gist](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716) and this [website](https://www.conventionalcommits.org/en/v1.0.0/). Using these kinds of commit messages will make contributors into better programmers because of its rigid style. Another reason of using it is because its rigid style actually forces contributors to **not commit lots of files in one setting.**
 
 ## Workflow
 
