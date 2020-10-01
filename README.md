@@ -114,3 +114,57 @@ python3 main.py <optional_arguments>
 * The application will then run, and then it will store its results in the `data/suggestions.csv` file.
 
 * As a note, optional arguments are explained in below setup.
+
+## Automation Setup
+
+This project is setup so that it could be automated everyday. I personally recommend you to use low-powered micro computers (also known as single board computers) like Raspberry Pi, BeagleBoard, Odroid, Banana Pi, and any other micro computers that you might have. The reason I recommended you those tools is because they are low-powered computers (electric bills are expensive nowadays) and they are literally equipped to be turned on 24/7 for IoT purposes. I use Raspberry Pi as it already had Git and Python installed the moment I installed the Raspbian OS.
+
+* First, in order to automate the gathering of anime characters, you have to modify the `main.sh` file as you see fit with your own arguments. Below are the list of the arguments available for this program.
+
+| Abbreviation |     Argument    |                                                      Purpose                                                      |    Default   |
+|:------------:|:---------------:|:-----------------------------------------------------------------------------------------------------------------:|:------------:|
+|      -h      |      --help     |                                            Prints out the help screen.                                            |     None     |
+|      -i      |       --id      |                  Randomly selects a character from an anime based on its media ID (from AniList)                  |     None     |
+|      -y      |      --year     |                       Randomly selects a character from animes based on its year of release                       | Current year |
+|      -s      |     --season    | Used to find a random character based on an anime from a season. Combine this with `--year` for better filtering. |     None     |
+|      -gf     | --gender-filter |             Used to enable or disable exceptions from being thrown if the character is of male gender             |     TRUE     |
+
+* Usage example from the `main.sh` file:
+
+```bash
+cd $HOME/Satella/auto
+nano main.sh
+
+# Modified line in the main.sh file.
+python3 main.py --year 2020 -s FALL
+
+# An another alternative is to search for characters from an anime based on its media ID.
+python3 main.py --id 113813 # We are searching for characters from Kanojo, Okarishimasu.
+```
+
+* Do not forget to check the `PYTHON_VENV` variable. Is it the same as your Python Virtual Environment that you created beforehand? If no, change it to your virtual environment.
+
+```bash
+PYTHON_VENV=.venv # Replace this '.venv' with your virtual environment.
+```
+
+* Even if you did not set up your own custom arguments / filters, you can always just leave it be and it will be run with default arguments.
+
+* After that, we need to setup our own crontab with Linux.
+
+```bash
+crontab -l
+crontab -e
+```
+
+* You need the following script to be entered in your crontab. The following script is used to make automatic updates every 09:00 AM.
+
+```bash
+00 09 * * * cd "$HOME/Satella/auto" && bash main.sh
+```
+
+* As a precaution, you might need to set permissions for the repository folder.
+
+```bash
+sudo chmod -R 777 "$HOME/Satella"
+```
