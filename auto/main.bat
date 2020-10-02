@@ -24,7 +24,7 @@ ECHO The CSV file has been written with a suggestion for you!
 :: 4) You have already configured the repository and the remote origin via 'git init' and 'git remote add origin <YOUR_GITHUB_REPO>'.
 :: 5) Alternatively, use SSH (https://stackoverflow.com/questions/8588768/how-do-i-avoid-the-specification-of-the-username-and-password-at-every-git-push).
 SET COMMIT_MESSAGE=chore: Character/anime suggestion on %date%
-git add suggestions.txt
+git add data/
 git commit -m "%COMMIT_MESSAGE%"
 git push --set-upstream origin master
 ECHO Committed successfully with commit message: %COMMIT_MESSAGE%
