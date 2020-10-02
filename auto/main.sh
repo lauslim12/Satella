@@ -10,7 +10,7 @@ git pull origin master
 # We need to use 'bash' to prevent the execution stack switching to the virtual environment.
 PYTHON_VENV=venv
 source "$PYTHON_VENV/bin/activate"
-python3 main.py
+python3 main.py --id 112300
 deactivate
 echo "The CSV file has been written with a suggestion for you!"
 
