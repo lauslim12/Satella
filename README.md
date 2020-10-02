@@ -202,10 +202,11 @@ git remote add origin <your_fork_url> # If the remote doesn't exist, then use yo
 * Alternatively, you could use SSH in order to free yourself from the hassle of authenticating Git everyday. The guide to setup your own SSH with Linux can be [seen here (answer from StackOverflow)](https://stackoverflow.com/questions/8588768/how-do-i-avoid-the-specification-of-the-username-and-password-at-every-git-push). Make sure that you have already configured your `git config user.name` and `git config user.email`.
 
 ```bash
-cd ~
+cd $HOME
 ssh-keygen -t rsa -b 4096 -C <your_github_email>
+cd .ssh
 ls -a # Check out your RSA '.pub' name.
-cat <your_linux_username>.pub
+cat id_rsa.pub # The default identifier is 'id_rsa'. You probably have a different identifier.
 # Then, configure your access keys with your GitHub configuration. After that...
 ssh -T git@github.com
 git remote set-url origin git+ssh://git@github.com/username/reponame.git
