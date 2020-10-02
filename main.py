@@ -1,11 +1,14 @@
-# BUG: If ID is placed, the 'generate_weighted_random' can fail. Look at line 100 and 285 (variable object and returned function). That is the cause of the bug.
+# BUG FIXED: If ID is placed, the 'generate_weighted_random' can fail. Look at line 100 and 285 (variable object and returned function). That is the cause of the bug.
 # TODO DONE: Add argparser, change weighed algorithm to be 10% of the max page, disable gender checks (argparser), and add counter to prevent hoarding.
+# TODO DONE: clean.py to main.py with argument parser.
 # TODO: Devise new algorithm step before looking checking -> first check all the total data in the current year. Store variable in the 'max_pages' variable.
 # TODO: Implement the 'NoneCharacterError' exception.
 # TODO: Also be able to check from manga.
 # TODO: PyInstaller for executable files.
 # TODO: CSV Name to constants -- add option to take from argument parser.
-# TODO: clean.py to main.py with argument parser.
+# TODO: Make the utilities in the class to be constants / file-scoped global variable.
+# TODO: Change the male filter to True, not 'TRUE'.
+# TODO: Changeable bias level.
 
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
@@ -32,6 +35,9 @@ __email__ = "nicholasdwiarto@yahoo.com"
 __status__ = "Prototype"
 
 # Constants
+FILENAME = 'data/suggestions.csv'
+CSV_HEADER = ['character_id', 'first_name', 'last_name', 'full_name',
+              'favorites', 'gender', 'gender_probability', 'anime_name', 'date_taken']
 API_MAX_CALL_PER_PROGRAM = 25  # max is 90, but I'm not pushing my luck.
 MAX_ANIME_PER_YEAR_ASSUMPTION = 400
 ANILIST_API_URL = "https://graphql.anilist.co"
@@ -94,6 +100,8 @@ query ($year: Int, $page: Int, $id: Int, $currentMainCharacterPage: Int, $curren
 parser = argparse.ArgumentParser(
     description="Satella (version {}) is a program that helps you get your favorite characters via a personalized algorithm. Contribute to the project by contacting @lauslim12 on GitHub!".format(__version__),
     epilog='Please enjoy this automated program! If you have any issues or have any suggestions, please contact @lauslim12 at GitHub!')
+parser.add_argument(
+    '-c', '--clean', help='Cleans the output CSV file except the header', action='store_true')
 parser.add_argument('-i', '--id', help='The anime ID that you want to query, but be warned that if you try to query by ID, then it is impossible to query by the year',
                     dest='specified_anime_id', type=int)
 parser.add_argument('-y', '--year', help='The year to search for the animes',
@@ -229,6 +237,14 @@ def check_maximum_page(data):
     pass
 
 
+def clean_csv():
+    with open('data/suggestions.csv', 'w', encoding='utf-8', newline='') as csv_file:
+        csv_writer = csv.writer(csv_file, delimiter=',')
+        csv_writer.writerow(CSV_HEADER)
+
+    print("Data successfully cleaned! Enjoy using the application!")
+
+
 def fetch_data(data, current_page=0):
     # Print message for clarity.
     print("Current page of the present query:", current_page)
@@ -256,7 +272,7 @@ def fetch_data(data, current_page=0):
     # BUG: Same as above.
     # Season: SPRING, SUMMER, FALL, WINTER
     # season_name = None
-    if args.season_name is not None:
+    if args.season_name is not None and args.id is None:
         variables.update({'seasonName': args.season_name})
 
     # Body to be sent.
@@ -487,8 +503,15 @@ def check_for_duplicate_entries(character_id, data):
 
 
 def main():
+    # If the user only wants to clear the CSV file, then we do not allocate the memory to the class.
+    if args.clean is True:
+        clean_csv()
+        return None
+
+    # Allocate the memory here.
     data = Data()
 
+    # Start the main program.
     while True:
         try:
             check_if_already_at_the_limit(data)
@@ -519,8 +542,12 @@ def main():
             break
         finally:
             data.free_resources()
+            print("")  # Empty line for clarity if run manually.
 
+    # Check the contents on the class.
     # pprint.pprint(vars(data))
+
+    return None
 
 
 if __name__ == "__main__":
