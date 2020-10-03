@@ -1,17 +1,19 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 # BUG FIXED: If ID is placed, the 'generate_weighted_random' can fail. Look at line 100 and 285 (variable object and returned function). That is the cause of the bug.
 # TODO DONE: Add argparser, change weighed algorithm to be 10% of the max page, disable gender checks (argparser), and add counter to prevent hoarding.
 # TODO DONE: clean.py to main.py with argument parser.
+# TODO DONE: Change the male filter to True, not 'TRUE'.
 # TODO: Devise new algorithm step before looking checking -> first check all the total data in the current year. Store variable in the 'max_pages' variable.
 # TODO: Implement the 'NoneCharacterError' exception.
 # TODO: Also be able to check from manga.
 # TODO: PyInstaller for executable files.
 # TODO: CSV Name to constants -- add option to take from argument parser.
 # TODO: Make the utilities in the class to be constants / file-scoped global variable.
-# TODO: Change the male filter to True, not 'TRUE'.
-# TODO: Changeable bias level.
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# TODO: Changeable bias level and top animes.
+# TODO: Also store link to large images for later processing in a web application.
+# TODO: Filter by genre.
 
 # Imports
 import argparse
@@ -108,8 +110,8 @@ parser.add_argument('-y', '--year', help='The year to search for the animes',
                     dest='year', default=datetime.now().year, type=int)
 parser.add_argument('-s',
                     '--season', help='The season to search for the animes. Can be combined with --year for better filtering', dest='season_name', choices=['SPRING', 'SUMMER', 'FALL', 'WINTER'], type=str)
-parser.add_argument('-gf',
-                    '--gender-filter', help='To disable exception being thrown if the character found is a male character', dest='male_filter', choices=['TRUE', 'FALSE'], type=str, default='TRUE')
+parser.add_argument('-dmf',
+                    '--disable-male-filter', help='To disable exception being thrown if the character found is a male character', dest='male_filter', action='store_false')
 parser.add_argument('-nf', '--none-filter', help='To disable exception being thrown if the character found is of unknown gender',
                     dest='none_filter', choices=['TRUE', 'FALSE'], type=str, default='FALSE')
 
@@ -272,7 +274,7 @@ def fetch_data(data, current_page=0):
     # BUG: Same as above.
     # Season: SPRING, SUMMER, FALL, WINTER
     # season_name = None
-    if args.season_name is not None and args.id is None:
+    if args.season_name is not None and args.specified_anime_id is None:
         variables.update({'seasonName': args.season_name})
 
     # Body to be sent.
@@ -440,7 +442,7 @@ def determine_gender(data):
     # If Null, another API call without the country code (some anime girls can have weird names)
     # If Null results in Null or Male (< 50%), insert to CSV.
     # BUG: Please use booleans, not strings.
-    if data.predicted_gender == "male" and data.predicted_probability > 0.5 and args.male_filter == "TRUE":
+    if data.predicted_gender == "male" and data.predicted_probability > 0.5 and args.male_filter is True:
         data.current_page = generate_weighted_random(data.max_pages)
         raise MaleCharacterError()
 
@@ -458,7 +460,7 @@ def determine_gender(data):
             character_name, data.predicted_gender, data.predicted_probability * 100))
 
         # BUG: Please use booleans, not strings.
-        if data.predicted_gender == "male" and data.predicted_probability > 0.5 and args.male_filter == "TRUE":
+        if data.predicted_gender == "male" and data.predicted_probability > 0.5 and args.male_filter is True:
             data.current_page = generate_weighted_random(data.max_pages)
             raise MaleCharacterError()
 
