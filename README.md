@@ -52,7 +52,7 @@ Satella works by following below pseudocode (simplified):
 
 3. The weighed number generator is 85% biased towards the number with higher favorites (means that you are more likely to get a character from a higher-favorited anime). As an added note, 'higher favorites' that we mean here is the top 10% anime for the current year. In other words, you are more likely to get a character from the top 10% anime of this year. Note that if you are querying by an ID, the random number gotten will always be one.
 
-4. If there is no anime based on a query (total page is zero), then retry step (1).
+4. If there is no anime based on a query (total page is zero), then stop the program execution.
 
 5. If there is an anime, then check if it has supporting characters or not. If not, then only take the main characters. If yes, then it is 50-50 chance to get either a main character or a supporting character. We will take the 'pool' or the array of main characters or the supporting characters.
 
@@ -138,14 +138,14 @@ This project is setup so that it could be automated everyday. I personally recom
 
 * First, in order to automate the gathering of anime characters, you have to modify the `main.sh` file as you see fit with your own arguments. Below are the list of the arguments available for this program.
 
-| Abbreviation |     Argument    |                                                                  Purpose                                                                 |    Default   |
-|:------------:|:---------------:|:----------------------------------------------------------------------------------------------------------------------------------------:|:------------:|
-|      -h      |      --help     |                                                        Prints out the help screen.                                                       |     None     |
-|      -c      |     --clean     |                                            Clear the CSV file with the exception of the header                                           |     False    |
-|      -i      |       --id      | Randomly selects a character from an anime based on its media ID (from AniList). Remember that you can't search by year if you use this! |     None     |
-|      -y      |      --year     |                                   Randomly selects a character from animes based on its year of release                                  | Current year |
-|      -s      |     --season    |             Used to find a random character based on an anime from a season. Combine this with `--year` for better filtering.            |     None     |
-|      -gf     | --gender-filter |                         Used to enable or disable exceptions from being thrown if the character is of male gender                        |     TRUE     |
+| Abbreviation |        Argument       |                                                                                    Purpose                                                                                   |    Default   |
+|:------------:|:---------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------:|
+|      -h      |         --help        |                                                                          Prints out the help screen.                                                                         |     None     |
+|      -c      |        --clean        |                               Clears the CSV file with the exception of the header. The `--clean` parameter cannot be used with anything else!                               |    `False`   |
+|      -i      |          --id         |     Randomly selects a character from an anime based on its media ID (from AniList). Remember that you can't search by year or the season name if you use this parameter!    |     None     |
+|      -y      |         --year        |                                                     Randomly selects a character from animes based on its year of release                                                    | Current year |
+|      -s      |        --season       | Used to find a random character based on an anime from a season. Combine this with `--year` for better filtering. Options available are `WINTER`, `SPRING`, `SUMMER`, `FALL` |     None     |
+|     -dmf     | --disable-male-filter |                                           Used to enable or disable exceptions from being thrown if the character is of male gender                                          |    `True`    |
 
 * Usage example from the `main.sh` file:
 
@@ -156,8 +156,17 @@ nano main.sh
 # Modified line in the main.sh file.
 python3 main.py --year 2020 -s FALL
 
+# This works as well (chaining multiple arguments).
+python3 main.py --year 2021 --season WINTER --disable-gender-filter
+
 # An another alternative is to search for characters from an anime based on its media ID.
-python3 main.py --id 113813 # We are searching for characters from Kanojo, Okarishimasu.
+python3 main.py --id 113813     # We are searching for characters from Kanojo, Okarishimasu.
+
+# Alternatives for the optional parametrs.
+python3 main.py --clean         # Cleans the CSV file with the exception of the header.
+python3 main.py --year 2019     # Get an anime from 2019.
+python3 main.py --season SUMMER # Get an anime from the summer season.
+python3 main.py --disable-male-filter # Disable male filter flag.
 ```
 
 * Do not forget to check the `PYTHON_VENV` variable. Is it the same as your Python Virtual Environment that you created beforehand? If no, change it to your virtual environment.
@@ -194,8 +203,8 @@ git config user.name <YOUR_USERNAME>
 git config user.email <YOUR_EMAIL>
 git config --list
 # Then, create a random commit to authenticate your password.
-
-git remote -v # Check if the remote exists.
+# Next, check your remotes.
+git remote -v                         # Check if the remote exists.
 git remote add origin <your_fork_url> # If the remote doesn't exist, then use your fork.
 ```
 
@@ -205,9 +214,10 @@ git remote add origin <your_fork_url> # If the remote doesn't exist, then use yo
 cd $HOME
 ssh-keygen -t rsa -b 4096 -C <your_github_email>
 cd .ssh
-ls -a # Check out your RSA '.pub' name.
-cat id_rsa.pub # The default identifier is 'id_rsa'. You probably have a different identifier.
-# Then, configure your access keys with your GitHub configuration. After that...
+ls -a             # Check out your RSA '.pub' name.
+cat id_rsa.pub    # The default identifier is 'id_rsa'. You probably have a different identifier.
+
+# Then, configure your access keys with your GitHub configuration. After that, test your connection.
 ssh -T git@github.com
 git remote set-url origin git+ssh://git@github.com/username/reponame.git
 ```
