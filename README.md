@@ -68,6 +68,8 @@ Satella works by following below pseudocode (simplified):
 
 11. We simply write the data of the character that we have already taken beforehand into a CSV file (`data/suggestions.csv` in this case).
 
+Please remember to follow [AniList API Terms Of Use](https://anilist.gitbook.io/anilist-apiv2-docs/), and remember not to hoard large amounts of data! Use this tool with responsibility!
+
 ## Project Structure
 
 The project structure itself is very simple.
@@ -160,13 +162,13 @@ python3 main.py --year 2020 -s FALL
 python3 main.py --year 2021 --season WINTER --disable-gender-filter
 
 # An another alternative is to search for characters from an anime based on its media ID.
-python3 main.py --id 113813     # We are searching for characters from Kanojo, Okarishimasu.
+python3 main.py --id 113813           # We are searching for characters from Kanojo, Okarishimasu.
 
-# Alternatives for the optional parametrs.
-python3 main.py --clean         # Cleans the CSV file with the exception of the header.
-python3 main.py --year 2019     # Get an anime from 2019.
-python3 main.py --season SUMMER # Get an anime from the summer season.
-python3 main.py --disable-male-filter # Disable male filter flag.
+# Alternatives for the optional parameters.
+python3 main.py --clean               # Cleans the CSV file with the exception of the header.
+python3 main.py --year 2019           # Get an anime from 2019.
+python3 main.py --season SUMMER       # Get an anime from the summer season.
+python3 main.py --disable-male-filter # Disable the male filter flag.
 ```
 
 * Do not forget to check the `PYTHON_VENV` variable. Is it the same as your Python Virtual Environment that you created beforehand? If no, change it to your virtual environment.
