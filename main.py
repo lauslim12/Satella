@@ -5,6 +5,7 @@
 # TODO DONE: Add argparser, change weighed algorithm to be 10% of the max page, disable gender checks (argparser), and add counter to prevent hoarding.
 # TODO DONE: clean.py to main.py with argument parser.
 # TODO DONE: Change the male filter to True, not 'TRUE'.
+# TODO DONE: 'Male filter' True to 'disable_male_filter' True. Much more readable by simply changing the name!
 # TODO: Devise new algorithm step before looking checking -> first check all the total data in the current year. Store variable in the 'max_pages' variable.
 # TODO: Implement the 'NoneCharacterError' exception.
 # TODO: Also be able to check from manga.
@@ -14,6 +15,9 @@
 # TODO: Changeable bias level and top animes.
 # TODO: Also store link to large images for later processing in a web application.
 # TODO: Filter by genre.
+# TODO: Add 'supporting-only' and 'main-only' on the filter.
+# TODO: Add function to store the image link.
+# TODO: Tidier requirements.txt file (https://stackoverflow.com/questions/17803829/how-to-customize-a-requirements-txt-for-multiple-environments)
 
 # Imports
 import argparse
@@ -111,7 +115,7 @@ parser.add_argument('-y', '--year', help='The year to search for the animes',
 parser.add_argument('-s',
                     '--season', help='The season to search for the animes. Can be combined with --year for better filtering', dest='season_name', choices=['SPRING', 'SUMMER', 'FALL', 'WINTER'], type=str)
 parser.add_argument('-dmf',
-                    '--disable-male-filter', help='To disable exception being thrown if the character found is a male character', dest='male_filter', action='store_false')
+                    '--disable-male-filter', help='To disable exception being thrown if the character found is a male character', dest='disable_male_filter', action='store_true')
 parser.add_argument('-nf', '--none-filter', help='To disable exception being thrown if the character found is of unknown gender',
                     dest='none_filter', choices=['TRUE', 'FALSE'], type=str, default='FALSE')
 
@@ -442,7 +446,7 @@ def determine_gender(data):
     # If Null, another API call without the country code (some anime girls can have weird names)
     # If Null results in Null or Male (< 50%), insert to CSV.
     # BUG: Please use booleans, not strings.
-    if data.predicted_gender == "male" and data.predicted_probability > 0.5 and args.male_filter is True:
+    if data.predicted_gender == "male" and data.predicted_probability > 0.5 and args.disable_male_filter is False:
         data.current_page = generate_weighted_random(data.max_pages)
         raise MaleCharacterError()
 
@@ -460,7 +464,7 @@ def determine_gender(data):
             character_name, data.predicted_gender, data.predicted_probability * 100))
 
         # BUG: Please use booleans, not strings.
-        if data.predicted_gender == "male" and data.predicted_probability > 0.5 and args.male_filter is True:
+        if data.predicted_gender == "male" and data.predicted_probability > 0.5 and args.disable_male_filter is False:
             data.current_page = generate_weighted_random(data.max_pages)
             raise MaleCharacterError()
 
