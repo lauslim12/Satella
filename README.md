@@ -76,10 +76,11 @@ The project structure itself is very simple.
 
 * The `auto` folder is used to store the automation scripts.
 * The `data` folder contains the output CSV file.
+* The `requirements` folder contains the development and production dependencies.
 * `clean.py` is a script to clean out the CSV file with the exception of the header.
 * `main.py` is the application starting point.
 * `auto/main.sh` and `auto/main.bat` are the shell scripts required for automating the system. For Linux and Windows, respectively.
-* The `requirements.txt` file is dedicated for the dependencies that I use to make and to keep this application running.
+* The `requirements.txt` file is dedicated for the dependencies (defaults to production dependencies) that I use to make and to keep this application running.
 * The rest are usual Git documents (`.gitignore`, `CONTRIBUTING.md`, `README.md`, `LICENSE`).
 
 ## Installation
@@ -103,19 +104,24 @@ git clone <your_fork_url>
 cd $HOME/Satella
 ```
 
-* Second, create a Python Virtual Environment (in your Linux machine), then install the requirements. You can also use the `setup.py` if you wish for it.
+* Second, create a Python Virtual Environment (in your Linux machine), then install the requirements. You can also use the `setup.py` if you wish for it. This setup is dedicated for **development** environment.
 
 ```bash
 python3 -m venv venv
 source "venv/bin/activate"
-pip3 install -r requirements.txt
+pip3 install -r requirements/dev.txt
+
+# Alternatively, you could use below script.
 python3 setup.py install
 ```
 
-* A note to keep in mind, if you just want to install the 'production-ready' environment (also known as plug-and-play), then you just need to install the `requests` library.
+* A note to keep in mind, if you just want to install the **production** environment (also known as plug-and-play), then you just need to install the production requirements.
 
 ```bash
-pip3 install requests
+pip3 install -r requirements.txt
+
+# Alternatively, below script is also possible.
+pip3 install -r requirements/prod.txt
 ```
 
 * As an initial setup, clear all the data that I might have in my repository.
@@ -140,14 +146,15 @@ This project is setup so that it could be automated everyday. I personally recom
 
 * First, in order to automate the gathering of anime characters, you have to modify the `main.sh` file as you see fit with your own arguments. Below are the list of the arguments available for this program.
 
-| Abbreviation |        Argument       |                                                                                    Purpose                                                                                   |    Default   |
-|:------------:|:---------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------:|
-|      -h      |         --help        |                                                                          Prints out the help screen.                                                                         |     None     |
-|      -c      |        --clean        |                               Clears the CSV file with the exception of the header. The `--clean` parameter cannot be used with anything else!                               |    `False`   |
-|      -i      |          --id         |     Randomly selects a character from an anime based on its media ID (from AniList). Remember that you can't search by year or the season name if you use this parameter!    |     None     |
-|      -y      |         --year        |                                                     Randomly selects a character from animes based on its year of release                                                    | Current year |
-|      -s      |        --season       | Used to find a random character based on an anime from a season. Combine this with `--year` for better filtering. Options available are `WINTER`, `SPRING`, `SUMMER`, `FALL` |     None     |
-|     -dmf     | --disable-male-filter |                                           Used to enable or disable exceptions from being thrown if the character is of male gender                                          |    `True`    |
+| Abbreviation |        Argument       |                                                                                      Purpose                                                                                     |    Default   |
+|:------------:|:---------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------:|
+|      -h      |         --help        |                                                                            Prints out the help screen                                                                            |     None     |
+|      -c      |        --clean        |                                 Clears the CSV file with the exception of the header. The `--clean` parameter cannot be used with anything else!                                 |    `False`   |
+|      -i      |          --id         |       Randomly selects a character from an anime based on its media ID (from AniList). Remember that you can't search by year or the season name if you use this parameter!      |     None     |
+|      -y      |         --year        |                                                       Randomly selects a character from animes based on its year of release                                                      | Current year |
+|      -s      |        --season       | Used to find a random character based on an anime from a season. Combine this with `--year` for better filtering. Options available are `WINTER`, `SPRING`, `SUMMER`, and `FALL` |     None     |
+|     -dmf     | --disable-male-filter |                                                     Used to disable exception being thrown if the character is of male gender                                                    |    `False`   |
+|     -enf     |  --enable-none-filter |                                                    Used to enable exception being thrown if the character is of unknown gender                                                   |    `False`   |
 
 * Usage example from the `main.sh` file:
 
