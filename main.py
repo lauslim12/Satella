@@ -16,7 +16,7 @@
 # TODO: Also store link to large images for later processing in a web application.
 # TODO: Filter by genre.
 # TODO: Add 'supporting-only' and 'main-only' on the filter.
-# TODO: Add function to store the image link.
+# TODO: Add function to store the image link (also banner image).
 # TODO: Tidier requirements.txt file (https://stackoverflow.com/questions/17803829/how-to-customize-a-requirements-txt-for-multiple-environments)
 
 # Imports
@@ -240,7 +240,32 @@ def check_if_already_at_the_limit(data):
 
 
 def check_maximum_page(data):
-    pass
+    # Increment API calls.
+    data.increment_api_calls()
+
+    # Check for the max value of a query.
+    variables = {
+        'year': args.year,
+    }
+
+    # Body to be sent.
+    request_body = {
+        'query': GRAPHQL_QUERY,
+        'variables': variables
+    }
+
+    # TODO: We have to create lines of code to parse our arguments like the 'fetch_data' function.
+
+    # API POST call to the GraphQL API.
+    response = requests.post(ANILIST_API_URL, json=request_body)
+    response = response.json()
+
+    # Get max pages and current page.
+    data.max_pages = response['data']['Page']['pageInfo']['total']
+    data.current_page = response['data']['Page']['pageInfo']['currentPage']
+
+    # Return none.
+    return None
 
 
 def clean_csv():
