@@ -159,7 +159,7 @@ nano main.sh
 python3 main.py --year 2020 -s FALL
 
 # This works as well (chaining multiple arguments).
-python3 main.py --year 2021 --season WINTER --disable-gender-filter
+python3 main.py --year 2021 --season WINTER --disable-male-filter
 
 # An another alternative is to search for characters from an anime based on its media ID.
 python3 main.py --id 113813           # We are searching for characters from Kanojo, Okarishimasu.
