@@ -77,7 +77,6 @@ The project structure itself is very simple.
 * The `auto` folder is used to store the automation scripts.
 * The `data` folder contains the output CSV file.
 * The `requirements` folder contains the development and production dependencies.
-* `clean.py` is a script to clean out the CSV file with the exception of the header.
 * `main.py` is the application starting point.
 * `auto/main.sh` and `auto/main.bat` are the shell scripts required for automating the system. For Linux and Windows, respectively.
 * The `requirements.txt` file is dedicated for the dependencies (defaults to production dependencies) that I use to make and to keep this application running.
