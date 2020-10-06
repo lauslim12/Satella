@@ -1,5 +1,7 @@
 # Python Virtual Environment
+.env
 .venv
+env
 venv
 
 # Visual Studio Code
@@ -7,5 +9,6 @@ venv
 
 # Python Distribution and Packaging
 *.egg
+*.egg-info
 build/
 dist/
