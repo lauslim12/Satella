@@ -5,7 +5,7 @@ with open('README.md', 'r') as file:
     long_description = file.read()
 
 # Dependencies
-with open('requirements.txt', 'r') as file:
+with open('requirements/dev.txt', 'r') as file:
     requirements = file.readlines()
 
 setuptools.setup(
