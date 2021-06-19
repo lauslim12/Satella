@@ -1,2 +1,0 @@
-# Mirrors from the production file.
--r requirements/prod.txt
