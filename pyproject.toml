@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "satella"
+version = "2.0.0"
+description = "Automated anime characters data gatherer for Internet of Things"
+authors = ["lauslim12 <nicholasdwiarto@yahoo.com>"]
+license = "BSD-3-Revised"
+readme = "README.md"
+homepage = "https://github.com/lauslim12/Satella"
+repository = "https://github.com/lauslim12/Satella"
+documentation = "https://github.com/lauslim12/Satella"
+classifiers = [
+  "Programming Language :: Python :: 3.9",
+  "License :: OSI Approved :: BSD-3-Clause",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: Microsoft :: Windows",
+  "Typing :: Typed",
+  "Framework :: AsyncIO",
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+aiohttp = {extras = ["speedups"], version = "^3.7.4"}
+
+[tool.poetry.dev-dependencies]
+black = "^21.6b0"
+pylint = "^2.8.3"
+isort = "^5.8.0"
+mypy = "^0.902"
+
+[tool.isort]
+profile = "black"
+line_length = "88"
+multi_line_output = "3"
+include_trailing_comma = "True"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
