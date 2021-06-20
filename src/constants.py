@@ -6,6 +6,8 @@ from os import path
 BIAS_PERCENTAGE = 85
 FILENAME = "suggestions.csv"
 FILENAME_PATH = path.abspath(path.join(path.dirname(__file__), "..", "data", FILENAME))
+LOGGING_FILENAME = "satella-log.log"
+LOGGING_PATH = path.abspath(path.join(path.dirname(__file__), "..", LOGGING_FILENAME))
 CSV_HEADERS = [
     "character_id",
     "first_name",

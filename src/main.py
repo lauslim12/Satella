@@ -1,6 +1,7 @@
 """Main functions, the application heart is located here."""
 
 import asyncio
+import logging
 from csv import writer
 from datetime import datetime
 from random import choice, randint
@@ -15,7 +16,7 @@ from anilist import (
     main_characters_page_info,
     supporting_characters_page_info,
 )
-from constants import FILENAME_PATH
+from constants import FILENAME_PATH, LOGGING_PATH
 from datatypes import (
     AniListRawResponse,
     Character,
@@ -101,7 +102,7 @@ async def get_character(api_response: AniListRawResponse) -> Data:
         character = choice(all_supporting_characters(response))
         return {**character, "anime": anime_name}
 
-    character = choice(all_main_characters(api_response))
+    character = choice(all_supporting_characters(api_response))
     return {**character, "anime": anime_name}
 
 
@@ -196,10 +197,15 @@ def write_to_csv(processed_data: ProcessedData) -> None:
 
 async def main() -> None:
     """Driver code to run the program."""
+    # initialize logging to analyze errors
+    logging.basicConfig(filename=LOGGING_PATH, encoding="utf-8", level=logging.INFO)
+
+    # if argument 'clean' is here, purge csv
     if args.clean:
         clean_csv()
         return
 
+    # enter main asynchronous loop
     while True:
         try:
             max_pages = await find_max_pages(args.year)
@@ -210,10 +216,10 @@ async def main() -> None:
             print(processed_data)
             # write_to_csv(processed_data)
         except (InvalidCharacterGenderError, NoMainCharactersError) as err:
-            print(err)
+            logging.info(err)
             continue
         except NoMediaFoundError as err:
-            print(err)
+            logging.info(err)
             break
         else:
             break
