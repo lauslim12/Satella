@@ -31,7 +31,7 @@ from exceptions import (
     NoMediaFoundError,
 )
 from genderize import fetch_genders_from_genderize
-from utilities import clean_csv, generate_weighted_random, initialize_args
+from utilities import clean_csv, clean_logs, generate_weighted_random, initialize_args
 
 # Global scope, the arguments passed.
 args = initialize_args()
@@ -198,11 +198,12 @@ def write_to_csv(processed_data: ProcessedData) -> None:
 async def main() -> None:
     """Driver code to run the program."""
     # initialize logging to analyze errors
-    logging.basicConfig(filename=LOGGING_PATH, encoding="utf-8", level=logging.INFO)
+    logging.basicConfig(filename=LOGGING_PATH, level=logging.INFO)
 
-    # if argument 'clean' is here, purge csv
+    # if argument 'clean' is here, purge csv and logs
     if args.clean:
         clean_csv()
+        clean_logs()
         return
 
     # enter main asynchronous loop

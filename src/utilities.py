@@ -6,7 +6,14 @@ from datetime import datetime
 from math import ceil
 from random import randint
 
-from constants import BIAS_PERCENTAGE, CSV_HEADERS, DESCRIPTION, EPILOG, FILENAME_PATH
+from constants import (
+    BIAS_PERCENTAGE,
+    CSV_HEADERS,
+    DESCRIPTION,
+    EPILOG,
+    FILENAME_PATH,
+    LOGGING_PATH,
+)
 
 
 def clean_csv() -> None:
@@ -14,6 +21,12 @@ def clean_csv() -> None:
     with open(FILENAME_PATH, "w", encoding="utf-8", newline="") as csv_file:
         csv_writer = writer(csv_file, delimiter=",")
         csv_writer.writerow(CSV_HEADERS)
+
+
+def clean_logs() -> None:
+    """Purges and cleans the log file."""
+    with open(LOGGING_PATH, "w"):
+        pass
 
 
 def generate_weighted_random(max_pages: int) -> int:
