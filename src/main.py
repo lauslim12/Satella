@@ -23,6 +23,12 @@ from datatypes import (
     GenderizeResponse,
     ProcessedData,
 )
+from exceptions import (
+    DuplicateEntryError,
+    InvalidCharacterGenderError,
+    NoMainCharactersError,
+    NoMediaFoundError,
+)
 from genderize import fetch_genders_from_genderize
 from utilities import clean_csv, generate_weighted_random, initialize_args
 
@@ -49,6 +55,10 @@ async def fetch_anime_data(max_pages: int) -> AniListRawResponse:
         variables = {**variables, "seasonName": args.season_name}
 
     api_response = await fetch_from_anilist(variables)
+
+    if not api_response["data"]["Page"]["media"]:
+        raise NoMediaFoundError("There is no media with that identifier!")
+
     return api_response
 
 
@@ -58,19 +68,20 @@ async def get_character(api_response: AniListRawResponse) -> Data:
     anime_name = anime_media(api_response)["title"]["userPreferred"]
     main_pages = main_characters_page_info(api_response)["lastPage"]
     supporting_pages = supporting_characters_page_info(api_response)["lastPage"]
-    take_from_main_characters = choice([True, False])
+    main_characters = main_characters_page_info(api_response)["total"]
+    supporting_characters = supporting_characters_page_info(api_response)["total"]
 
-    if supporting_pages == 0:
-        page_to_take = randint(1, main_pages)
+    # raise exception if no main characters are found.
+    if main_characters == 0:
+        raise NoMainCharactersError(f"There are no characters for anime: {anime_name}!")
 
-        if page_to_take > 1:
-            response = await fetch_from_anilist_specific_page(anime_id, page_to_take)
-            character = choice(all_main_characters(response))
-            return {**character, "anime": anime_name}
+    # if there are any supporting characters, make a choice.
+    if supporting_characters > 0:
+        take_from_main_characters = choice([True, False])
+    else:
+        take_from_main_characters = True
 
-        character = choice(all_main_characters(api_response))
-        return {**character, "anime": anime_name}
-
+    # take data from main characters.
     if take_from_main_characters:
         page_to_take = randint(1, main_pages)
 
@@ -82,6 +93,7 @@ async def get_character(api_response: AniListRawResponse) -> Data:
         character = choice(all_main_characters(api_response))
         return {**character, "anime": anime_name}
 
+    # take data from supporting characters.
     page_to_take = randint(1, supporting_pages)
 
     if page_to_take > 1:
@@ -89,7 +101,7 @@ async def get_character(api_response: AniListRawResponse) -> Data:
         character = choice(all_supporting_characters(response))
         return {**character, "anime": anime_name}
 
-    character = choice(all_supporting_characters(api_response))
+    character = choice(all_main_characters(api_response))
     return {**character, "anime": anime_name}
 
 
@@ -150,7 +162,7 @@ def get_essential_data(
     ):
         return {"character": character, "gender": worldwide_genderize}
 
-    raise Exception("Data not found.")
+    raise InvalidCharacterGenderError("Invalid character gender generated!")
 
 
 def write_to_csv(processed_data: ProcessedData) -> None:
@@ -158,6 +170,13 @@ def write_to_csv(processed_data: ProcessedData) -> None:
     character = processed_data["character"]
     gender = processed_data["gender"]
 
+    # check for duplicates before inserting the data.
+    with open(FILENAME_PATH, "r", encoding="utf-8") as csv_file:
+        character_id = character["id"]
+        if str(character_id) in csv_file.read():
+            raise DuplicateEntryError(f"Character {character_id} already exists!")
+
+    # write file to csv
     with open(FILENAME_PATH, "a", newline="", encoding="utf-8") as csv_file:
         csv_writer = writer(csv_file)
         csv_writer.writerow(
@@ -182,14 +201,22 @@ async def main() -> None:
         return
 
     while True:
-        max_pages = await find_max_pages(args.year)
-        api_data = await fetch_anime_data(max_pages)
-        character = await get_character(api_data)
-        gender = await determine_gender(character)
-        processed_data = get_essential_data(character, gender)
-        print(processed_data["character"])
-        # write_to_csv(processed_data)
-        break
+        try:
+            max_pages = await find_max_pages(args.year)
+            api_data = await fetch_anime_data(max_pages)
+            character = await get_character(api_data)
+            gender = await determine_gender(character)
+            processed_data = get_essential_data(character, gender)
+            print(processed_data)
+            # write_to_csv(processed_data)
+        except (InvalidCharacterGenderError, NoMainCharactersError) as err:
+            print(err)
+            continue
+        except NoMediaFoundError as err:
+            print(err)
+            break
+        else:
+            break
 
 
 if __name__ == "__main__":
