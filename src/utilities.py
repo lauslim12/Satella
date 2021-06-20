@@ -6,7 +6,7 @@ from datetime import datetime
 from math import ceil
 from random import randint
 
-from constants import BIAS_PERCENTAGE, CSV_HEADERS, FILENAME_PATH
+from constants import BIAS_PERCENTAGE, CSV_HEADERS, DESCRIPTION, EPILOG, FILENAME_PATH
 
 
 def clean_csv() -> None:
@@ -22,12 +22,11 @@ def generate_weighted_random(max_pages: int) -> int:
     If the data is too small, we will not be using this function.
     Usually, that is because we queried by anime ID. Result is only 1 if that happens.
     """
-    number = randint(1, 100)
-
     if max_pages == 1:
         return 1
 
     top_anime_pages = ceil(max_pages * 0.1)
+    number = randint(1, 100)
 
     if number <= BIAS_PERCENTAGE:
         return randint(1, top_anime_pages)
@@ -37,16 +36,9 @@ def generate_weighted_random(max_pages: int) -> int:
 
 def initialize_args() -> Namespace:
     """Initializes arguments for the program. Will be on a global scope."""
-    description = """
-    Satella is a program that helps you get your favorite characters via a personalized algorithm. Contribute to the project by contacting @lauslim12 on GitHub!
-    """
-    epilog = """
-    Please enjoy! If you have any issues or have any suggestions, please contact @lauslim12 on GitHub!
-    """
-
     parser = ArgumentParser(
-        description=description,
-        epilog=epilog,
+        description=DESCRIPTION,
+        epilog=EPILOG,
     )
     parser.add_argument(
         "-c",

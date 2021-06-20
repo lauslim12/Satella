@@ -18,6 +18,14 @@ CSV_HEADERS = [
     "date_taken",
 ]
 
+# CLI purposes.
+DESCRIPTION = """
+Satella is a program that helps you get your favorite characters via a personalized algorithm. Contribute to the project by contacting @lauslim12 on GitHub!
+"""
+EPILOG = """
+Please enjoy! If you have any issues or have any suggestions, please contact @lauslim12 on GitHub!
+"""
+
 # Genderize constants.
 GENDERIZE_API_URL = "https://api.genderize.io"
 
