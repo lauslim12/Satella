@@ -1,6 +1,12 @@
-# Application
-FILENAME = "data/suggestions.csv"
-CSV_HEADER = [
+"""This file will store all of the constants needed to operate the program."""
+
+from os import path
+
+# Application constants.
+BIAS_PERCENTAGE = 85
+FILENAME = "suggestions.csv"
+FILENAME_PATH = path.abspath(path.join(path.dirname(__file__), "..", "data", FILENAME))
+CSV_HEADERS = [
     "character_id",
     "first_name",
     "last_name",
@@ -12,12 +18,11 @@ CSV_HEADER = [
     "date_taken",
 ]
 
-# Genderize
+# Genderize constants.
 GENDERIZE_API_URL = "https://api.genderize.io"
 
-# AniList
+# AniList constants.
 ANILIST_API_URL = "https://graphql.anilist.co"
-API_MAX_CALL_PER_PROGRAM = 25  # max is 90, but I'm not pushing my luck.
 GRAPHQL_QUERY = """
 query ($year: Int, $page: Int, $id: Int, $currentMainCharacterPage: Int, $currentSupportingCharacterPage: Int, $seasonName: MediaSeason) {
     Page(page: $page, perPage: 1) {
