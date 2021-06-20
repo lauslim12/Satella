@@ -166,7 +166,7 @@ def get_essential_data(
     raise InvalidCharacterGenderError("Invalid character gender generated!")
 
 
-def write_to_csv(processed_data: ProcessedData) -> None:
+def write_to_csv(processed_data: ProcessedData) -> int:
     """Writes the data to the CSV file."""
     character = processed_data["character"]
     gender = processed_data["gender"]
@@ -194,6 +194,9 @@ def write_to_csv(processed_data: ProcessedData) -> None:
             ]
         )
 
+    # returns the ID to be inserted into the logfile.
+    return character["id"]
+
 
 async def main() -> None:
     """Driver code to run the program."""
@@ -204,9 +207,11 @@ async def main() -> None:
     if args.clean:
         clean_csv()
         clean_logs()
+        logging.info("Exit Satella, cleaning logs...")
         return
 
     # enter main asynchronous loop
+    # pylint said that the logging must use lazy interpolations
     while True:
         try:
             max_pages = await find_max_pages(args.year)
@@ -214,8 +219,8 @@ async def main() -> None:
             character = await get_character(api_data)
             gender = await determine_gender(character)
             processed_data = get_essential_data(character, gender)
-            print(processed_data)
-            # write_to_csv(processed_data)
+            character_id = write_to_csv(processed_data)
+            logging.info("Inserted character with ID: %s", character_id)
         except (InvalidCharacterGenderError, NoMainCharactersError) as err:
             logging.info(err)
             continue
@@ -223,6 +228,7 @@ async def main() -> None:
             logging.info(err)
             break
         else:
+            logging.info("Exit Satella, job done...")
             break
 
 
