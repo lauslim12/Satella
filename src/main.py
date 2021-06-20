@@ -1,33 +1,199 @@
-#!usr/bin/env/python3
-# -*- coding: utf-8 -*-
+"""Main functions, the application heart is located here."""
+
 import asyncio
-import json
-from typing import Any, Dict
+from csv import writer
+from datetime import datetime
+from random import choice, randint
 
-import aiohttp
+from anilist import (
+    all_main_characters,
+    all_supporting_characters,
+    anime_media,
+    anime_page_info,
+    fetch_from_anilist,
+    fetch_from_anilist_specific_page,
+    main_characters_page_info,
+    supporting_characters_page_info,
+)
+from constants import FILENAME_PATH
+from datatypes import (
+    AniListRawResponse,
+    Character,
+    Data,
+    GenderizeResponse,
+    ProcessedData,
+)
+from genderize import fetch_genders_from_genderize
+from utilities import clean_csv, generate_weighted_random, initialize_args
 
-from constants import ANILIST_API_URL, GRAPHQL_QUERY
+# Global scope, the arguments passed.
+args = initialize_args()
 
 
-async def fetch_anime_data(variables: Dict[str, Any]):
-    request_body = {
-        "query": GRAPHQL_QUERY,
-        "variables": variables,
-    }
+async def find_max_pages(year: int) -> int:
+    """Finds the max pages for the current year."""
+    response = await fetch_from_anilist({"year": year})
+    total_page: int = anime_page_info(response)["total"]
 
-    async with aiohttp.ClientSession() as session:
-        async with session.post(ANILIST_API_URL, json=request_body) as response:
-            return await response.json()
+    return total_page
 
 
-async def request():
-    result = await fetch_anime_data({"year": 2021, "page": 6})
-    print(json.dumps(result, indent=2, ensure_ascii=False))
+async def fetch_anime_data(max_pages: int) -> AniListRawResponse:
+    """Fetches the anime data according to the variables passed."""
+    page_to_search = generate_weighted_random(max_pages)
+    variables = {"year": args.year, "page": page_to_search}
+
+    if args.specified_anime_id:
+        variables = {"id": args.specified_anime_id}
+    elif args.specified_anime_id is None and args.season_name:
+        variables = {**variables, "seasonName": args.season_name}
+
+    api_response = await fetch_from_anilist(variables)
+    return api_response
 
 
-async def main():
-    await request()
+async def get_character(api_response: AniListRawResponse) -> Data:
+    """Gets a character from the API response."""
+    anime_id = anime_media(api_response)["id"]
+    anime_name = anime_media(api_response)["title"]["userPreferred"]
+    main_pages = main_characters_page_info(api_response)["lastPage"]
+    supporting_pages = supporting_characters_page_info(api_response)["lastPage"]
+    take_from_main_characters = choice([True, False])
+
+    if supporting_pages == 0:
+        page_to_take = randint(1, main_pages)
+
+        if page_to_take > 1:
+            response = await fetch_from_anilist_specific_page(anime_id, page_to_take)
+            character = choice(all_main_characters(response))
+            return {**character, "anime": anime_name}
+
+        character = choice(all_main_characters(api_response))
+        return {**character, "anime": anime_name}
+
+    if take_from_main_characters:
+        page_to_take = randint(1, main_pages)
+
+        if page_to_take > 1:
+            response = await fetch_from_anilist_specific_page(anime_id, page_to_take)
+            character = choice(all_main_characters(response))
+            return {**character, "anime": anime_name}
+
+        character = choice(all_main_characters(api_response))
+        return {**character, "anime": anime_name}
+
+    page_to_take = randint(1, supporting_pages)
+
+    if page_to_take > 1:
+        response = await fetch_from_anilist_specific_page(anime_id, page_to_take)
+        character = choice(all_supporting_characters(response))
+        return {**character, "anime": anime_name}
+
+    character = choice(all_supporting_characters(api_response))
+    return {**character, "anime": anime_name}
+
+
+async def determine_gender(character: Data) -> list[GenderizeResponse]:
+    """Determines the gender of the character."""
+    character_name = character["name"]
+
+    if character_name["first"]:
+        character_name = character_name["first"].strip()
+    else:
+        character_name = character_name["last"].strip()
+
+    genderize_parameters = [
+        f"?name={character_name}&country_id=JP",
+        f"?name={character_name}",
+    ]
+
+    result: list[GenderizeResponse] = await fetch_genders_from_genderize(
+        genderize_parameters
+    )
+    return result
+
+
+def get_essential_data(
+    character: Character, gender: list[GenderizeResponse]
+) -> ProcessedData:
+    """Gets the essential data of the character to be written to the CSV file."""
+    japanese_genderize = gender[0]
+    worldwide_genderize = gender[1]
+
+    # if allow both male/none characters
+    if args.allow_male_characters and args.allow_none_characters:
+        return {"character": character, "gender": japanese_genderize}
+
+    # if allow male characters
+    if args.allow_male_characters and (
+        japanese_genderize["gender"] == "male"
+        and japanese_genderize["probabilty"] > 0.50
+    ):
+        return {"character": character, "gender": japanese_genderize}
+
+    if args.allow_male_characters and (
+        worldwide_genderize["gender"] == "male"
+        and worldwide_genderize["probability"] > 0.50
+    ):
+        return {"character": character, "gender": worldwide_genderize}
+
+    # if only allow female characters
+    if (
+        japanese_genderize["gender"] == "female"
+        and japanese_genderize["probability"] > 0.50
+    ):
+        return {"character": character, "gender": japanese_genderize}
+
+    if (
+        worldwide_genderize["gender"] == "female"
+        and worldwide_genderize["probability"] > 0.50
+    ):
+        return {"character": character, "gender": worldwide_genderize}
+
+    raise Exception("Data not found.")
+
+
+def write_to_csv(processed_data: ProcessedData) -> None:
+    """Writes the data to the CSV file."""
+    character = processed_data["character"]
+    gender = processed_data["gender"]
+
+    with open(FILENAME_PATH, "a", newline="", encoding="utf-8") as csv_file:
+        csv_writer = writer(csv_file)
+        csv_writer.writerow(
+            [
+                character["id"],
+                character["name"]["first"],
+                character["name"]["last"],
+                character["name"]["full"],
+                character["favourites"],
+                gender["gender"],
+                gender["probability"],
+                character["anime"],
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            ]
+        )
+
+
+async def main() -> None:
+    """Driver code to run the program."""
+    if args.clean:
+        clean_csv()
+        return
+
+    while True:
+        max_pages = await find_max_pages(args.year)
+        api_data = await fetch_anime_data(max_pages)
+        character = await get_character(api_data)
+        gender = await determine_gender(character)
+        processed_data = get_essential_data(character, gender)
+        print(processed_data["character"])
+        # write_to_csv(processed_data)
+        break
 
 
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
+    loop.run_until_complete(asyncio.sleep(0))
+    loop.close()
