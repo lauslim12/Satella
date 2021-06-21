@@ -56,13 +56,16 @@ async def fetch_anime_data(max_pages: int) -> AniListRawResponse:
     page_to_search = generate_weighted_random(max_pages)
     variables = {"year": args.year, "page": page_to_search}
 
+    # if there are any special arguments, we do some checks
     if args.specified_anime_id:
         variables = {"id": args.specified_anime_id}
     elif not args.specified_anime_id and args.season_name:
         variables = {**variables, "seasonName": args.season_name}
 
+    # fetch from anilist
     api_response = await fetch_from_anilist(variables)
 
+    # if searching by id, prevent empty data
     if not media_exists(api_response):
         raise NoMediaFoundError("There is no media with that identifier!")
 
@@ -173,7 +176,7 @@ def write_to_csv(processed_data: ProcessedData) -> Union[int, NoReturn]:
     character = processed_data["character"]
     gender = processed_data["gender"]
 
-    # check for duplicates before inserting the data.
+    # check for duplicates before inserting the data
     with open(FILENAME_PATH, "r", encoding="utf-8") as csv_file:
         character_id = character["id"]
         if str(character_id) in csv_file.read():
@@ -196,7 +199,7 @@ def write_to_csv(processed_data: ProcessedData) -> Union[int, NoReturn]:
             ]
         )
 
-    # returns the ID to be inserted into the logfile.
+    # returns the ID to be inserted into the logfile
     returned_id: int = character_id
     return returned_id
 
@@ -215,7 +218,7 @@ async def main() -> None:
     if args.clean:
         clean_csv()
         clean_logs()
-        logging.info("Exit Satella, cleaning logs...")
+        logging.info("Exit Satella, cleaning logs done.")
         return
 
     # enter main asynchronous loop
@@ -240,11 +243,12 @@ async def main() -> None:
             logging.info(err)
             break
         else:
-            logging.info("Exit Satella, job done...")
+            logging.info("Exit Satella, job done.")
             break
 
 
 if __name__ == "__main__":
+    # ensure that the loop is gracefully exited
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
     loop.run_until_complete(asyncio.sleep(0))
