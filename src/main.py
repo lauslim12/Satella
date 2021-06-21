@@ -204,7 +204,12 @@ def write_to_csv(processed_data: ProcessedData) -> Union[int, NoReturn]:
 async def main() -> None:
     """Driver code to run the program."""
     # initialize logging to analyze errors
-    logging.basicConfig(filename=LOGGING_PATH, level=logging.INFO)
+    logging.basicConfig(
+        filename=LOGGING_PATH,
+        format="%(asctime)s %(message)s",
+        datefmt="%d/%m/%Y %H:%M:%S",
+        level=logging.INFO,
+    )
 
     # if argument 'clean' is here, purge csv and logs
     if args.clean:
@@ -224,7 +229,11 @@ async def main() -> None:
             processed_data = get_essential_data(character, gender)
             character_id = write_to_csv(processed_data)
             logging.info("Inserted character with ID: %s", character_id)
-        except (InvalidCharacterGenderError, NoMainCharactersError) as err:
+        except (
+            InvalidCharacterGenderError,
+            NoMainCharactersError,
+            DuplicateEntryError,
+        ) as err:
             logging.info(err)
             continue
         except NoMediaFoundError as err:
