@@ -1,21 +1,37 @@
 [tool.poetry]
 name = "satella"
 version = "2.0.0"
-description = "Automated anime characters data gatherer for Internet of Things"
+description = "Automated anime characters data gatherer for Internet of Things."
 authors = ["lauslim12 <nicholasdwiarto@yahoo.com>"]
-license = "BSD-3-Revised"
+license = "BSD-3-Clause"
 readme = "README.md"
 homepage = "https://github.com/lauslim12/Satella"
 repository = "https://github.com/lauslim12/Satella"
 documentation = "https://github.com/lauslim12/Satella"
+keywords = [
+  "asyncio",
+  "automation",
+  "embedded-systems",
+  "internet-of-things",
+  "raspberry-pi",
+]
 classifiers = [
-  "Programming Language :: Python :: 3.9",
-  "License :: OSI Approved :: BSD-3-Clause",
+  "Development Status :: 5 - Production/Stable",
+  "Framework :: AsyncIO",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: POSIX",
   "Operating System :: POSIX :: Linux",
   "Operating System :: MacOS :: MacOS X",
   "Operating System :: Microsoft :: Windows",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Topic :: Internet",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+  "Topic :: Software Development :: Embedded Systems",
+  "Topic :: Utilities",
   "Typing :: Typed",
-  "Framework :: AsyncIO",
 ]
 
 [tool.poetry.dependencies]
