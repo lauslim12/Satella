@@ -14,6 +14,7 @@ from anilist import (
     fetch_from_anilist,
     fetch_from_anilist_specific_page,
     main_characters_page_info,
+    media_exists,
     supporting_characters_page_info,
 )
 from constants import FILENAME_PATH, LOGGING_PATH
@@ -30,7 +31,11 @@ from exceptions import (
     NoMainCharactersError,
     NoMediaFoundError,
 )
-from genderize import fetch_genders_from_genderize
+from genderize import (
+    fetch_genders_from_genderize,
+    is_female_character,
+    is_male_character,
+)
 from utilities import clean_csv, clean_logs, generate_weighted_random, initialize_args
 
 # Global scope, the arguments passed.
@@ -52,12 +57,12 @@ async def fetch_anime_data(max_pages: int) -> AniListRawResponse:
 
     if args.specified_anime_id:
         variables = {"id": args.specified_anime_id}
-    elif args.specified_anime_id is None and args.season_name:
+    elif not args.specified_anime_id and args.season_name:
         variables = {**variables, "seasonName": args.season_name}
 
     api_response = await fetch_from_anilist(variables)
 
-    if not api_response["data"]["Page"]["media"]:
+    if not media_exists(api_response):
         raise NoMediaFoundError("There is no media with that identifier!")
 
     return api_response
@@ -72,17 +77,17 @@ async def get_character(api_response: AniListRawResponse) -> Data:
     main_characters = main_characters_page_info(api_response)["total"]
     supporting_characters = supporting_characters_page_info(api_response)["total"]
 
-    # raise exception if no main characters are found.
+    # raise exception if no main characters are found
     if main_characters == 0:
         raise NoMainCharactersError(f"There are no characters for anime: {anime_name}!")
 
-    # if there are any supporting characters, make a choice.
+    # if there are any supporting characters, make a choice
     if supporting_characters > 0:
         take_from_main_characters = choice([True, False])
     else:
         take_from_main_characters = True
 
-    # take data from main characters.
+    # take data from main characters
     if take_from_main_characters:
         page_to_take = randint(1, main_pages)
 
@@ -94,7 +99,7 @@ async def get_character(api_response: AniListRawResponse) -> Data:
         character = choice(all_main_characters(api_response))
         return {**character, "anime": anime_name}
 
-    # take data from supporting characters.
+    # take data from supporting characters
     page_to_take = randint(1, supporting_pages)
 
     if page_to_take > 1:
@@ -110,16 +115,19 @@ async def determine_gender(character: Data) -> list[GenderizeResponse]:
     """Determines the gender of the character."""
     character_name = character["name"]
 
+    # get either first name or last name
     if character_name["first"]:
         character_name = character_name["first"].strip()
     else:
         character_name = character_name["last"].strip()
 
+    # create parameters for the genderize api
     genderize_parameters = [
         f"?name={character_name}&country_id=JP",
         f"?name={character_name}",
     ]
 
+    # get results from the api
     result: list[GenderizeResponse] = await fetch_genders_from_genderize(
         genderize_parameters
     )
@@ -137,30 +145,20 @@ def get_essential_data(
     if args.allow_male_characters and args.allow_none_characters:
         return {"character": character, "gender": japanese_genderize}
 
-    # if allow male characters
-    if args.allow_male_characters and (
-        japanese_genderize["gender"] == "male"
-        and japanese_genderize["probabilty"] > 0.50
-    ):
+    # if allow male characters - japanese genderize
+    if args.allow_male_characters and is_male_character(japanese_genderize):
         return {"character": character, "gender": japanese_genderize}
 
-    if args.allow_male_characters and (
-        worldwide_genderize["gender"] == "male"
-        and worldwide_genderize["probability"] > 0.50
-    ):
+    # if allow male characters - worldwide genderize
+    if args.allow_male_characters and is_male_character(worldwide_genderize):
         return {"character": character, "gender": worldwide_genderize}
 
-    # if only allow female characters
-    if (
-        japanese_genderize["gender"] == "female"
-        and japanese_genderize["probability"] > 0.50
-    ):
+    # if only allow female characters - japanese genderize
+    if is_female_character(japanese_genderize):
         return {"character": character, "gender": japanese_genderize}
 
-    if (
-        worldwide_genderize["gender"] == "female"
-        and worldwide_genderize["probability"] > 0.50
-    ):
+    # if only allow female characters - worldwide genderize
+    if is_female_character(worldwide_genderize):
         return {"character": character, "gender": worldwide_genderize}
 
     raise InvalidCharacterGenderError("Invalid character gender generated!")
@@ -195,7 +193,8 @@ def write_to_csv(processed_data: ProcessedData) -> int:
         )
 
     # returns the ID to be inserted into the logfile.
-    return character["id"]
+    returned_id: int = character_id
+    return returned_id
 
 
 async def main() -> None:
@@ -219,8 +218,9 @@ async def main() -> None:
             character = await get_character(api_data)
             gender = await determine_gender(character)
             processed_data = get_essential_data(character, gender)
-            character_id = write_to_csv(processed_data)
-            logging.info("Inserted character with ID: %s", character_id)
+            print(processed_data)
+            # character_id = write_to_csv(processed_data)
+            # logging.info("Inserted character with ID: %s", character_id)
         except (InvalidCharacterGenderError, NoMainCharactersError) as err:
             logging.info(err)
             continue
