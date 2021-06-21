@@ -5,6 +5,7 @@ import logging
 from csv import writer
 from datetime import datetime
 from random import choice, randint
+from typing import NoReturn, Union
 
 from anilist import (
     all_main_characters,
@@ -68,7 +69,7 @@ async def fetch_anime_data(max_pages: int) -> AniListRawResponse:
     return api_response
 
 
-async def get_character(api_response: AniListRawResponse) -> Data:
+async def get_character(api_response: AniListRawResponse) -> Union[Data, NoReturn]:
     """Gets a character from the API response."""
     anime_id = anime_media(api_response)["id"]
     anime_name = anime_media(api_response)["title"]["userPreferred"]
@@ -136,7 +137,7 @@ async def determine_gender(character: Data) -> list[GenderizeResponse]:
 
 def get_essential_data(
     character: Character, gender: list[GenderizeResponse]
-) -> ProcessedData:
+) -> Union[ProcessedData, NoReturn]:
     """Gets the essential data of the character to be written to the CSV file."""
     japanese_genderize = gender[0]
     worldwide_genderize = gender[1]
@@ -161,10 +162,13 @@ def get_essential_data(
     if is_female_character(worldwide_genderize):
         return {"character": character, "gender": worldwide_genderize}
 
-    raise InvalidCharacterGenderError("Invalid character gender generated!")
+    character_name = character["name"]["first"]
+    raise InvalidCharacterGenderError(
+        f"Invalid character gender generated! Character name: {character_name}."
+    )
 
 
-def write_to_csv(processed_data: ProcessedData) -> int:
+def write_to_csv(processed_data: ProcessedData) -> Union[int, NoReturn]:
     """Writes the data to the CSV file."""
     character = processed_data["character"]
     gender = processed_data["gender"]
@@ -218,9 +222,8 @@ async def main() -> None:
             character = await get_character(api_data)
             gender = await determine_gender(character)
             processed_data = get_essential_data(character, gender)
-            print(processed_data)
-            # character_id = write_to_csv(processed_data)
-            # logging.info("Inserted character with ID: %s", character_id)
+            character_id = write_to_csv(processed_data)
+            logging.info("Inserted character with ID: %s", character_id)
         except (InvalidCharacterGenderError, NoMainCharactersError) as err:
             logging.info(err)
             continue
