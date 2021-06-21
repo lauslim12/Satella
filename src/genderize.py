@@ -31,3 +31,19 @@ async def fetch_genders_from_genderize(
         # alternative to 'Promise.all' in JavaScript
         responses: list[GenderizeResponse] = await asyncio.gather(*tasks)
         return responses
+
+
+def is_male_character(gender: GenderizeResponse) -> bool:
+    """Checks whether the character is male or not."""
+    if gender["gender"] == "male" and gender["probability"] > 0.5:
+        return True
+
+    return False
+
+
+def is_female_character(gender: GenderizeResponse) -> bool:
+    """Checks whether the character is female or not."""
+    if gender["gender"] == "female" and gender["probability"] > 0.5:
+        return True
+
+    return False

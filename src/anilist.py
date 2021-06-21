@@ -60,3 +60,11 @@ def main_characters_page_info(raw_data: AniListRawResponse) -> PageInfo:
 def supporting_characters_page_info(raw_data: AniListRawResponse) -> PageInfo:
     """Returns the supporting characters page info from the data."""
     return anime_media(raw_data)["supportingCharacters"]["pageInfo"]
+
+
+def media_exists(raw_data: AniListRawResponse) -> bool:
+    """Returns a boolean whether there is any media or not."""
+    if raw_data["data"]["Page"]["media"]:
+        return True
+
+    return False
