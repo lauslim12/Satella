@@ -28,9 +28,11 @@ from datatypes import (
 )
 from exceptions import (
     DuplicateEntryError,
+    InternalServerError,
     InvalidCharacterGenderError,
     NoMainCharactersError,
     NoMediaFoundError,
+    TooManyRequestsError,
 )
 from genderize import (
     fetch_genders_from_genderize,
@@ -95,6 +97,7 @@ async def get_character(api_response: AniListRawResponse) -> Union[Data, NoRetur
     if take_from_main_characters:
         page_to_take = randint(1, main_pages)
 
+        # randomize pages to take before getting one character randomly
         if page_to_take > 1:
             response = await fetch_from_anilist_specific_page(anime_id, page_to_take)
             character = choice(all_main_characters(response))
@@ -106,6 +109,7 @@ async def get_character(api_response: AniListRawResponse) -> Union[Data, NoRetur
     # take data from supporting characters
     page_to_take = randint(1, supporting_pages)
 
+    # randomize pages to take before getting one character randomly
     if page_to_take > 1:
         response = await fetch_from_anilist_specific_page(anime_id, page_to_take)
         character = choice(all_supporting_characters(response))
@@ -165,6 +169,7 @@ def get_essential_data(
     if is_female_character(worldwide_genderize):
         return {"character": character, "gender": worldwide_genderize}
 
+    # raise invalid character gender if statements does not short-circuit
     character_name = character["name"]["first"]
     raise InvalidCharacterGenderError(
         f"Invalid character gender generated! Character name: {character_name}."
@@ -209,7 +214,7 @@ async def main() -> None:
     # initialize logging to analyze errors
     logging.basicConfig(
         filename=LOGGING_PATH,
-        format="%(asctime)s %(message)s",
+        format="%(levelname)s:%(asctime)s %(message)s",
         datefmt="%d/%m/%Y %H:%M:%S",
         level=logging.INFO,
     )
@@ -236,11 +241,15 @@ async def main() -> None:
             InvalidCharacterGenderError,
             NoMainCharactersError,
             DuplicateEntryError,
-        ) as err:
-            logging.info(err)
+        ) as operational_error:
+            logging.info(operational_error)
             continue
-        except NoMediaFoundError as err:
-            logging.info(err)
+        except (
+            NoMediaFoundError,
+            InternalServerError,
+            TooManyRequestsError,
+        ) as side_effect_error:
+            logging.warning(side_effect_error)
             break
         else:
             logging.info("Exit Satella, job done.")
@@ -248,7 +257,7 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    # ensure that the loop is gracefully exited
+    # ensures that the loop is gracefully exited
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
     loop.run_until_complete(asyncio.sleep(0))
