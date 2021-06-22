@@ -5,6 +5,7 @@ import aiohttp
 
 from constants import ANILIST_API_URL, GRAPHQL_QUERY
 from datatypes import AniListRawResponse, Character, Media, PageInfo
+from utilities import valid_response
 
 
 async def fetch_from_anilist(variables: dict[str, Any]) -> AniListRawResponse:
@@ -13,7 +14,8 @@ async def fetch_from_anilist(variables: dict[str, Any]) -> AniListRawResponse:
 
     async with aiohttp.ClientSession() as session:
         async with session.post(ANILIST_API_URL, json=request_body) as response:
-            return await response.json()
+            if valid_response(response, "AniList"):
+                return await response.json()
 
 
 async def fetch_from_anilist_specific_page(

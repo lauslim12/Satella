@@ -7,6 +7,7 @@ from aiohttp.client import ClientSession
 
 from constants import GENDERIZE_API_URL
 from datatypes import GenderizeResponse
+from utilities import valid_response
 
 
 async def fetch_genderize(session: ClientSession, parameter: str) -> GenderizeResponse:
@@ -14,7 +15,8 @@ async def fetch_genderize(session: ClientSession, parameter: str) -> GenderizeRe
     formatted_url = f"{GENDERIZE_API_URL}/{parameter}"
 
     async with session.get(formatted_url) as response:
-        return await response.json()
+        if valid_response(response, "Genderize"):
+            return await response.json()
 
 
 async def fetch_genders_from_genderize(

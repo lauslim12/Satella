@@ -1,10 +1,12 @@
 """Utility functions for the program."""
-
 from argparse import ArgumentParser, Namespace
 from csv import writer
 from datetime import datetime
 from math import ceil
 from random import randint
+from typing import Literal, NoReturn, Union
+
+from aiohttp import ClientResponse
 
 from constants import (
     BIAS_PERCENTAGE,
@@ -14,6 +16,7 @@ from constants import (
     FILENAME_PATH,
     LOGGING_PATH,
 )
+from exceptions import InternalServerError, TooManyRequestsError
 
 
 def clean_csv() -> None:
@@ -100,3 +103,20 @@ def initialize_args() -> Namespace:
     args = parser.parse_args()
 
     return args
+
+
+def valid_response(
+    response: ClientResponse, api_name: Literal["AniList", "Genderize"]
+) -> Union[bool, NoReturn]:
+    """Error handling function to check whether the response is valid or not."""
+    if response.status == 429:
+        raise TooManyRequestsError(
+            f"Satella has reached rate limiter for the {api_name} API! Please try again later!"
+        )
+
+    if response.status == 500:
+        raise InternalServerError(
+            f"Satella has found an internal error in the {api_name} API! Please try again later!"
+        )
+
+    return True
