@@ -6,11 +6,24 @@ In order to contribute to this project, please follow these style guide and work
 
 Please follow this for the sake of the code to be as readable and maintainable as possible.
 
-* **_Use your best spelling and punctuation, in English._**
-* Please use `autopep8` package to format your code
-* Please use `pylint` package to lint your code for any possible errors
+- **_Use your best spelling and punctuation, in English._**
+- Please use `black` and `isort` packages to format your code.
+- Please use `pylint` and/or `pylance` packages to lint your code for any possible errors.
+- Please use `mypy` package to ensure that the data types that you code are correct.
 
-Both `autopep8` and `pylint` are available in the `requirements.txt` file.
+All of the packages are available in the `pyproject.toml` file.
+
+## Example Usage
+
+Below is an example usage of how to conform to the coding style.
+
+```bash
+cd Satella
+black .
+isort .
+mypy .
+pylint src
+```
 
 ## Commit Style Guide
 
@@ -18,9 +31,9 @@ Please use [Semantic Commit Messages](https://seesparkbox.com/foundry/semantic_c
 
 ## Workflow
 
-In order to contribute to this project, please create an issue about the problem that you are going to fix / add. After that, follow these instructions below.
+In order to contribute to this project, please create an issue about the problem that you are going to fix / add so that we can discuss it together. After that, follow these instructions below.
 
-* Fork the repository.
-* Create a new branch based on the issue number that you created beforehand. Example: `git checkout -b 10`.
-* Commit and push your features / changes.
-* Create a new pull request.
+- Fork the repository.
+- Create a new branch based on the issue number that you created beforehand. Example: `git checkout -b 10`.
+- Commit and push your features / changes.
+- Create a new pull request.

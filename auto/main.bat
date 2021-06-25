@@ -12,7 +12,7 @@ git pull origin master
 :: This is to prevent the execution stack to be transferred to the 'activate' batch file.
 SET PYTHON_VENV=.venv
 CALL "%PYTHON_VENV%\Scripts\activate"
-python main.py
+python src/main.py
 CALL "%PYTHON_VENV%\Scripts\deactivate"
 ECHO The CSV file has been written with a suggestion for you!
 
