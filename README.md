@@ -213,14 +213,14 @@ git remote add origin <YOUR_FORK_URL> # If the remote doesn't exist, then use yo
 
 ```bash
 cd $HOME
-ssh-keygen -t rsa -b 4096 -C <YOUR_GITHUB_EMAIL>
-cd .ssh
-ls -a             # Check out your RSA '.pub' name.
-cat id_rsa.pub    # The default identifier is 'id_rsa'. You probably have a different identifier.
+ssh-keygen -t ed25519 -C <YOUR_GITHUB_EMAIL>
+eval "$(ssh-agent -s)"      # Start SSH agent.
+ssh-add ~/.ssh/id_ed25519   # Add key to SSH agent.
+cat .ssh/id_ed25519.pub     # Copy the key to your clipboard. This is the default identifier.
 
 # Then, configure your access keys with your GitHub configuration. After that, test your connection.
 ssh -T git@github.com
-git remote set-url origin git+ssh://git@github.com/username/reponame.git # Replace with your fork URL!
+git remote set-url origin git@github.com:<YOUR_GITHUB_USERNAME>/Satella.git # Replace with your fork URL!
 ```
 
 - Enjoy your new anime character recommendation everyday! Just check your own repository for any new updates!
