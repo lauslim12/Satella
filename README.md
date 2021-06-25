@@ -28,11 +28,11 @@ The name 'Satella' comes from the the character 'Satella' from Re:Zero. I actual
 
 ## Requirements
 
-In order to run the baseline of this application, you just need the following two things.
+In order to run the baseline of this application, you just need the following three things.
 
 - Windows / Linux Environment (Linux is recommended)
 - Python 3.9 and up
-- Poetry (optional)
+- Poetry
 
 In order to automate the application, then you will also need these:
 
@@ -77,14 +77,27 @@ The project structure itself is very simple.
 
 The installation guide assumes that you are using Linux for this part. For those using Windows, you just have to replace the `python3` with `python`. For the automation, just use the `main.bat` (instead of `main.sh`) file. Personally, I use my Raspberry Pi via SSH to do the installation steps.
 
+## Preparations
+
+Some notes before you get started:
+
+- If you are using Raspberry Pi, usually the Python available is not the latest. You can build from source and use the newest version.
+
+- You have to install [Poetry](https://python-poetry.org/). Here is the example on how to do this the recommended way.
+
+```bash
+curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+```
+
 ### General Setup
 
 The following setup is used to start the application on its basic form.
 
-- Ensure that your Python is 3.9 or up!
+- Ensure that your Python is 3.9 or up and ensure that Poetry is installed!
 
 ```bash
 python3 --version
+poetry --version
 ```
 
 - First off, fork my repository, then clone it. I am going to assume that you cloned the repository to the `Home` directory.
@@ -94,19 +107,16 @@ git clone <YOUR_FORK_URL>
 cd $HOME/Satella
 ```
 
-- Second, create a Python Virtual Environment (in your Linux machine), install `poetry` as the package manager, and then install the dependencies. You can also use the `setup.py` if you wish for it. This setup is dedicated for **development** environment.
+- Create a new Poetry Virtual Environment.
 
 ```bash
-python3 -m venv .venv
-source ".venv/bin/activate"
-pip3 install poetry
-poetry install
+poetry shell
 ```
 
-- Alternatively, you can install `poetry` with the recommended way.
+- Install the dependencies. This setup is dedicated for **development** environment.
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+poetry install
 ```
 
 - A note to keep in mind, if you just want to install the **production** environment (also known as plug-and-play), then you just need to install the production requirements.
@@ -169,9 +179,16 @@ python3 src/main.py --season SUMMER         # Get an anime from the summer seaso
 python3 src/main.py --allow-male-characters # Allows male characters.
 ```
 
-- Do not forget to check the `PYTHON_VENV` variable. Is it the same as your Python Virtual Environment that you created beforehand? If no, change it to your virtual environment.
+- While you are still in the Poetry Virtual Environment, get the Virtual Environment path.
 
 ```bash
+poetry env info --path
+```
+
+- Change the `PYTHON_VENV` variable. Is it the same as your Poetry Virtual Environment that you created beforehand? If no, change that to your Poetry Virtual Environment.
+
+```bash
+# main.sh
 PYTHON_VENV=.venv # Replace this '.venv' with your virtual environment.
 ```
 
@@ -190,12 +207,6 @@ crontab -e
 00 09 * * * cd "$HOME/Satella/auto" && bash main.sh
 ```
 
-- As a precaution, you might need to set permissions for the repository folder.
-
-```bash
-sudo chmod -R 777 "$HOME/Satella"
-```
-
 - Do not forget to setup your Git account in your machine so you can make automated cronjobs everyday.
 
 ```bash
@@ -209,7 +220,7 @@ git remote -v                         # Check if the remote exists.
 git remote add origin <YOUR_FORK_URL> # If the remote doesn't exist, then use your fork.
 ```
 
-- Alternatively, you could use SSH in order to free yourself from the hassle of authenticating Git everyday. The guide to setup your own SSH with Linux can be [seen here (answer from StackOverflow)](https://stackoverflow.com/questions/8588768/how-do-i-avoid-the-specification-of-the-username-and-password-at-every-git-push). Make sure that you have already configured your `git config user.name` and `git config user.email`.
+- Alternatively, you could use SSH in order to free yourself from the hassle of authenticating Git everyday. The guide to setup your own SSH with Linux can be [seen here (from GitHub Documentation)](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent). Make sure that you have already configured your `git config user.name` and `git config user.email`.
 
 ```bash
 cd $HOME
