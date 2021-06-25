@@ -77,7 +77,7 @@ The project structure itself is very simple.
 
 The installation guide assumes that you are using Linux for this part. For those using Windows, you just have to replace the `python3` with `python`. For the automation, just use the `main.bat` (instead of `main.sh`) file. Personally, I use my Raspberry Pi via SSH to do the installation steps.
 
-## Preparations
+### Preparations
 
 Some notes before you get started:
 
