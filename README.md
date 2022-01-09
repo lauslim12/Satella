@@ -32,7 +32,7 @@ In order to run the baseline of this application, you just need the following th
 
 - Windows / Linux Environment (Linux is recommended)
 - Python 3.9 and up
-- Poetry
+- Poetry (Optional)
 
 In order to automate the application, then you will also need these:
 
@@ -61,7 +61,7 @@ Satella works by following below steps (simplified):
 
 9. We simply write the data of the character that we have already taken beforehand into a CSV file (`data/suggestions.csv` in this case).
 
-All network requests are processed with aiohttp asynchronously for performance. Don't forget to remember to follow [AniList API Terms Of Use](https://anilist.gitbook.io/anilist-apiv2-docs/), and remember not to hoard large amounts of data! Use this tool with responsibility!
+All network requests are processed with `aiohttp` asynchronously for performance. Don't forget to remember to follow [AniList API Terms Of Use](https://anilist.gitbook.io/anilist-apiv2-docs/), and remember not to hoard large amounts of data! Use this tool with responsibility!
 
 ## Project Structure
 
@@ -83,10 +83,18 @@ Some notes before you get started:
 
 - If you are using Raspberry Pi, usually the Python available is not the latest. You can build from source and use the newest version.
 
-- You have to install [Poetry](https://python-poetry.org/). Here is the example on how to do this the recommended way.
+- You have to install [Poetry](https://python-poetry.org/). Here is the example on how to do this the recommended way:
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+```
+
+- Alternatively, if you prefer doing things via virtual environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install poetry
 ```
 
 ### General Setup
@@ -107,7 +115,7 @@ git clone <YOUR_FORK_URL>
 cd $HOME/Satella
 ```
 
-- Create a new Poetry Virtual Environment.
+- If you are using Poetry globally, create a new Poetry Virtual Environment. Skip this step if you are using Python Virtual Environment with Poetry inside.
 
 ```bash
 poetry shell
@@ -179,10 +187,17 @@ python3 src/main.py --season SUMMER         # Get an anime from the summer seaso
 python3 src/main.py --allow-male-characters # Allows male characters.
 ```
 
-- While you are still in the Poetry Virtual Environment, get the Virtual Environment path.
+- While you are still in the Poetry Virtual Environment, get the Virtual Environment path. If you are using Python Virtual Environment, copy the path.
 
 ```bash
+# venv
+cd .venv/bin
+pwd
+deactivate
+
+# poetry
 poetry env info --path
+exit
 ```
 
 - Change the `PYTHON_VENV` variable. Is it the same as your Poetry Virtual Environment that you created beforehand? If no, change that to your Poetry Virtual Environment.
@@ -242,14 +257,14 @@ git remote set-url origin git@github.com:<YOUR_GITHUB_USERNAME>/Satella.git # Re
 sudo grep CRON /var/log/syslog
 ```
 
-- You can also check the logs to check for the actions that the application has made.
+- You can also check the logs to check for the actions that the application have made.
 
 ```bash
 cd $HOME/Satella
 cat satella-log.log
 ```
 
-- Note that if you are using Windows as your machine that will run this program, you could bind the `main.bat` script to Windows Task Scheduler. I believe you just need to follow the instructions from the GUI to setup the scheduled tasks.
+- Note that if you are using Windows as a machine that will run this program, you could bind the `main.bat` script to Windows Task Scheduler. I believe you just need to follow the instructions from the GUI to setup the scheduled tasks.
 
 ## Data Inference
 
