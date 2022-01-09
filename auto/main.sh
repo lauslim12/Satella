@@ -4,7 +4,7 @@
 cd ..
 
 # Pull from the latest repository.
-git pull origin master
+git pull origin main
 
 # Run Python Virtual Environment.
 # We need to use 'bash' to prevent the execution stack switching to the virtual environment.
@@ -25,5 +25,5 @@ CURRENT_DATE=$(date -I)
 COMMIT_MESSAGE="chore: Character/anime suggestion on $CURRENT_DATE"
 git add data/
 git commit -m "$COMMIT_MESSAGE"
-git push -u origin master
+git push -u origin main
 echo "Committed successfully with commit message: $COMMIT_MESSAGE"
