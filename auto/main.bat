@@ -5,7 +5,7 @@
 cd ..
 
 :: Pull from the latest repository.
-git pull origin master
+git pull origin main
 
 :: Run Python Virtual Environment.
 :: CALL is used as 'activate' and 'deactivate' is a batch file.
@@ -26,5 +26,5 @@ ECHO The CSV file has been written with a suggestion for you!
 SET COMMIT_MESSAGE=chore: Character/anime suggestion on %date%
 git add data/
 git commit -m "%COMMIT_MESSAGE%"
-git push --set-upstream origin master
+git push --set-upstream origin main
 ECHO Committed successfully with commit message: %COMMIT_MESSAGE%
