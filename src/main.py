@@ -28,6 +28,7 @@ from datatypes import (
 )
 from exceptions import (
     DuplicateEntryError,
+    EmptyPageError,
     InternalServerError,
     InvalidCharacterGenderError,
     NoMainCharactersError,
@@ -68,8 +69,14 @@ async def fetch_anime_data(max_pages: int) -> AniListRawResponse:
     api_response = await fetch_from_anilist(variables)
 
     # if searching by id, prevent empty data
-    if not media_exists(api_response):
+    if not media_exists(api_response) and args.specified_anime_id:
         raise NoMediaFoundError("There is no media with that identifier!")
+
+    # if searching randomly, allow continuation on empty pages
+    if not media_exists(api_response):
+        raise EmptyPageError(
+            f"There is no content in page '{page_to_search}' in the current query!"
+        )
 
     return api_response
 
@@ -238,6 +245,7 @@ async def main() -> None:
             character_id = write_to_csv(processed_data)
             logging.info("Inserted character with ID: %s", character_id)
         except (
+            EmptyPageError,
             InvalidCharacterGenderError,
             NoMainCharactersError,
             DuplicateEntryError,

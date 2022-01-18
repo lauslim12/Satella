@@ -5,6 +5,10 @@ class DuplicateEntryError(Exception):
     """Exception that will be raised when the program finds duplicate entries."""
 
 
+class EmptyPageError(Exception):
+    """Exception that will be raised if the program finds an empty page."""
+
+
 class InternalServerError(Exception):
     """Exception that will be raised if there is an internal server error."""
 
