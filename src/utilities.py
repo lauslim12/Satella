@@ -28,7 +28,7 @@ def clean_csv() -> None:
 
 def clean_logs() -> None:
     """Purges and cleans the log file."""
-    with open(LOGGING_PATH, "w"):
+    with open(LOGGING_PATH, "w", encoding="utf-8"):
         pass
 
 
